@@ -486,7 +486,7 @@
         {
           "type": "string",
           "enum": ["eth", "gwei", "timestamp", "address", "boolean", "blocknumber", "duration", "bytes32-utf8", "token-id", "percentage", "basis-points", "token-amount", "date", "datetime", "hidden"],
-          "description": "Semantic type. Tells consumers what a value represents and how to render it in both read and write contexts."
+          "description": "Semantic type. Tells consumers what a value represents and how to render it in both read and write contexts. Amount-like types share one contract (display = raw / 10^decimals, rendered with a symbol): \"eth\" is a raw wei value shown as ETH (decimals 18); \"gwei\" is a raw wei value shown as gwei (decimals 9)."
         },
         {
           "type": "object",
@@ -520,6 +520,25 @@
             }
           },
           "description": "Token amount for a specific ERC-20, ERC-721, or ERC-1155. Display: format with decimals and symbol. Input: show balance and max button."
+        },
+        {
+          "type": "object",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "amount" },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 18,
+              "description": "Fixed-point decimals. Display value = raw / 10^decimals. Default: 18."
+            },
+            "symbol": {
+              "type": "string",
+              "description": "Unit label shown after the value (e.g. \"USD\"). Optional."
+            }
+          },
+          "description": "Generic fixed-point amount with no asset identity (oracle prices, share prices, accounting units). For native ETH use \"eth\"; for a real token use \"token-amount\"."
         },
         {
           "type": "object",

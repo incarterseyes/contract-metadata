@@ -192,8 +192,8 @@ The `type` field on a parameter is a semantic annotation that tells consumers wh
 
 | Type           | Meaning                                                           |
 | -------------- | ----------------------------------------------------------------- |
-| `eth`          | Value in wei, represents an ETH amount                            |
-| `gwei`         | Value in gwei                                                     |
+| `eth`          | Raw wei value, displayed as ETH (18 decimals) -- see Amount-like Types |
+| `gwei`         | Raw wei value, displayed as gwei (9 decimals)                     |
 | `timestamp`    | Unix timestamp (display: formatted date, input: date picker)      |
 | `address`      | Ethereum address (with ENS resolution)                            |
 | `boolean`      | Boolean value                                                     |
@@ -219,6 +219,9 @@ Types that need additional configuration MUST use an object form:
 // Token amount for a specific token
 { "type": "token-amount", "tokenAddress": "0x..." }
 
+// Generic fixed-point amount (oracle price, share price, accounting unit)
+{ "type": "amount", "decimals": 8, "symbol": "USD" }
+
 // Token ID for a specific NFT collection
 { "type": "token-id", "tokenAddress": "0x..." }
 
@@ -228,6 +231,19 @@ Types that need additional configuration MUST use an object form:
 // Slider -- input: render as range slider
 { "type": "slider", "min": "0", "max": "9999", "step": "1" }
 ```
+
+#### Amount-like Types
+
+`eth`, `gwei`, `token-amount`, and `amount` share one formatting contract -- **display value = raw integer / 10^decimals**, rendered with a symbol. They differ only in where `decimals` and `symbol` come from:
+
+| Type           | decimals                       | symbol                  | asset                   |
+| -------------- | ------------------------------ | ----------------------- | ----------------------- |
+| `eth`          | 18 (fixed)                     | ETH (fixed)             | native                  |
+| `gwei`         | 9 (fixed)                      | gwei (fixed)            | native                  |
+| `token-amount` | on-chain `decimals()`          | on-chain `symbol()`     | token at `tokenAddress` |
+| `amount`       | `decimals` field (default 18)  | optional `symbol` field | none                    |
+
+Use `eth` or `token-amount` when the asset has an identity; use `amount` only for fixed-point numbers with no asset -- oracle outputs, share prices, internal accounting units.
 
 ### Autofill
 

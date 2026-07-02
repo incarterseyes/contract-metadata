@@ -328,8 +328,9 @@
           }
         },
         "priceUSD": {
-          "label": "price (USD, 8 decimals)",
-          "description": "Monthly price in USD with 8 decimal places (e.g. 1000000000 = $10)"
+          "label": "price",
+          "description": "Monthly price in USD (e.g. 1000000000 = $10).",
+          "type": { "type": "amount", "decimals": 8, "symbol": "USD" }
         }
       }
     },
@@ -339,8 +340,9 @@
       "group": "admin",
       "params": {
         "priceUSD": {
-          "label": "price (USD, 8 decimals)",
-          "description": "Monthly price in USD with 8 decimal places"
+          "label": "price",
+          "description": "Monthly price in USD.",
+          "type": { "type": "amount", "decimals": 8, "symbol": "USD" }
         }
       }
     },
@@ -470,7 +472,7 @@
             }
           }
         },
-        "priceUSD": { "label": "price (USD, 8 decimals)" }
+        "priceUSD": { "label": "price", "type": { "type": "amount", "decimals": 8, "symbol": "USD" } }
       }
     },
     "HookUpdated": {
