@@ -17,6 +17,7 @@ interface ActionEntry {
   group?: string
   related?: string[]
   params?: Record<string, ParamEntry>
+  value?: ParamEntry
 }
 
 interface ParamEntry {
@@ -111,6 +112,62 @@ function isValidFunctionRef(ref: string): boolean {
   return SELECTOR_4BYTE.test(ref) || SIGNATURE_RE.test(ref) || BARE_NAME_RE.test(ref)
 }
 
+function inputFlagChecks(p: ParamEntry, where: string): string[] {
+  const warnings: string[] = []
+  if (p.hidden && p.autofill === undefined) {
+    warnings.push(`${where}.hidden requires autofill`)
+  }
+  if (p.disabled && p.autofill === undefined) {
+    warnings.push(`${where}.disabled requires autofill`)
+  }
+  if (p.hidden && p.disabled) {
+    warnings.push(`${where}.hidden and .disabled are mutually exclusive`)
+  }
+  return warnings
+}
+
+// The symbolic constraint a locked (hidden/disabled) param contributes to
+// calldata matching, or null if the autofill can't be matched against
+// (block-timestamp) or the param isn't locked.
+function lockedConstraint(p: ParamEntry): string | null {
+  if (!p.hidden && !p.disabled) return null
+  const a = p.autofill
+  if (typeof a === 'string') {
+    return a === 'block-timestamp' ? null : a
+  }
+  if (a && typeof a === 'object' && (a as { type?: string }).type === 'constant') {
+    return `constant:${(a as { value?: string }).value}`
+  }
+  return null
+}
+
+// Two actions on the same function with identical locked constraints can't be
+// told apart when matching decoded calldata — flag them.
+function ambiguityChecks(actions: Record<string, ActionEntry>): string[] {
+  const warnings: string[] = []
+  const seen = new Map<string, string>()
+  for (const [id, action] of Object.entries(actions)) {
+    const fn = action.function ?? id
+    const locks = Object.entries(action.params ?? {})
+      .map(([pKey, p]) => [pKey, lockedConstraint(p)] as const)
+      .filter(([, c]) => c !== null)
+      .map(([pKey, c]) => `${pKey}=${c}`)
+      .sort()
+    if (action.value) {
+      const c = lockedConstraint(action.value)
+      if (c !== null) locks.push(`msg.value=${c}`)
+    }
+    const key = `${fn}|${locks.join(',')}`
+    const prior = seen.get(key)
+    if (prior !== undefined) {
+      warnings.push(`actions.${id} and actions.${prior} target "${fn}" with identical locked parameters — calldata matching cannot distinguish them`)
+    } else {
+      seen.set(key, id)
+    }
+  }
+  return warnings
+}
+
 function semanticChecks(data: ContractData, path: string): string[] {
   const warnings: string[] = []
   const groups = data.groups ? Object.keys(data.groups) : []
@@ -147,18 +204,16 @@ function semanticChecks(data: ContractData, path: string): string[] {
 
       if (action.params) {
         for (const [pKey, p] of Object.entries(action.params)) {
-          if (p.hidden && p.autofill === undefined) {
-            warnings.push(`actions.${id}.params.${pKey}.hidden requires autofill`)
-          }
-          if (p.disabled && p.autofill === undefined) {
-            warnings.push(`actions.${id}.params.${pKey}.disabled requires autofill`)
-          }
-          if (p.hidden && p.disabled) {
-            warnings.push(`actions.${id}.params.${pKey}.hidden and .disabled are mutually exclusive`)
-          }
+          warnings.push(...inputFlagChecks(p, `actions.${id}.params.${pKey}`))
         }
       }
+
+      if (action.value) {
+        warnings.push(...inputFlagChecks(action.value, `actions.${id}.value`))
+      }
     }
+
+    warnings.push(...ambiguityChecks(data.actions))
   }
 
   if (data.events) {

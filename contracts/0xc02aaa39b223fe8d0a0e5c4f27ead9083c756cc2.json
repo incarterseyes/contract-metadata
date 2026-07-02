@@ -30,9 +30,12 @@
     "deposit": {
       "title": "Wrap ETH",
       "description": "Wrap ETH into WETH. Send ETH with this transaction to receive the same amount in WETH.",
-      "intent": "Wrap ETH into WETH",
+      "intent": "Wrap {value} into WETH",
       "group": "wrap",
-      "warning": "Sends ETH value — make sure msg.value is set."
+      "value": {
+        "label": "amount",
+        "description": "The amount of ETH to wrap. You receive the same amount in WETH."
+      }
     },
     "withdraw": {
       "title": "Unwrap WETH",

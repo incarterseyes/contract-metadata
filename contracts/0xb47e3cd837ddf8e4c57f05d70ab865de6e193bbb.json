@@ -176,9 +176,12 @@
       "order": 2,
       "title": "Buy Punk",
       "description": "Buy a punk that is currently listed for sale. Send ETH equal to or greater than the asking price.",
-      "intent": "Buy Punk #{punkIndex}",
+      "intent": "Buy Punk #{punkIndex} for {value}",
       "group": "marketplace",
-      "warning": "Sends ETH — make sure msg.value meets the asking price.",
+      "value": {
+        "label": "payment",
+        "description": "Must meet or exceed the asking price. Excess is not refunded."
+      },
       "params": {
         "punkIndex": {
           "label": "punk index",
@@ -246,9 +249,13 @@
       "order": 6,
       "title": "Place Bid",
       "description": "Place a bid on a punk by sending ETH. Your ETH is held in the contract until the bid is accepted or you withdraw it.",
-      "intent": "Place bid on Punk #{punkIndex}",
+      "intent": "Bid {value} on Punk #{punkIndex}",
       "group": "marketplace",
       "warning": "Your ETH will be locked in the contract until the bid is accepted or withdrawn.",
+      "value": {
+        "label": "bid amount",
+        "description": "Held by the contract until the bid is accepted or you withdraw it."
+      },
       "params": {
         "punkIndex": {
           "label": "punk index",

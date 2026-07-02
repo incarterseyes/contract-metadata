@@ -301,7 +301,7 @@
         },
         "intent": {
           "type": "string",
-          "description": "Template string rendered with formatted parameter values. Use {paramName} placeholders (e.g. \"Transfer {wad} to {dst}\"). Prefix with # to prepend a hash symbol (e.g. \"Buy Punk #{punkIndex}\" renders as \"Buy Punk #7804\"). Values are formatted using their type before insertion."
+          "description": "Template string rendered with formatted parameter values. Use {paramName} placeholders (e.g. \"Transfer {wad} to {dst}\"). Prefix with # to prepend a hash symbol (e.g. \"Buy Punk #{punkIndex}\" renders as \"Buy Punk #7804\"). {value} refers to the transaction value when the action declares a value object and no ABI parameter is named value. Values are formatted using their type before insertion."
         },
         "group": {
           "type": "string",
@@ -317,7 +317,7 @@
         },
         "hidden": {
           "type": "boolean",
-          "description": "Hide this action from the default UI. Use for internal or admin-only actions that clutter the interface, or to suppress the ABI-synthesized default when only variants should render."
+          "description": "Hide this action from the default UI. Use for internal or admin-only actions that clutter the interface. If every authored action referencing a function is hidden, the function itself is hidden."
         },
         "stateMutability": {
           "type": "string",
@@ -330,6 +330,10 @@
           "additionalProperties": {
             "$ref": "#/$defs/ParamMeta"
           }
+        },
+        "value": {
+          "$ref": "#/$defs/ValueMeta",
+          "description": "Metadata for the native currency (msg.value) sent with the call. Only meaningful on payable functions."
         },
         "returns": {
           "type": "object",
@@ -502,6 +506,42 @@
           "description": "When true, render the input but make it non-editable. Displays the autofilled value for transparency. REQUIRES `autofill`. Mutually exclusive with `hidden: true`."
         }
       }
+    },
+    "ValueMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^_[a-zA-Z]": {
+          "description": "Extension object. Names must start with _ followed by a letter. Consumers that do not understand a given extension must ignore it."
+        }
+      },
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for the attached native currency amount."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "One short sentence on what the attached amount pays for."
+        },
+        "autofill": {
+          "$ref": "#/$defs/Autofill",
+          "description": "Pre-populate the value input. A constant is denominated in wei."
+        },
+        "validation": {
+          "$ref": "#/$defs/ValidationRule"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "When true, do not render a value input. The `autofill` value is attached at call time. REQUIRES `autofill`."
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "When true, render the value input but make it non-editable (e.g. a fixed mint price). REQUIRES `autofill`. Mutually exclusive with `hidden: true`."
+        }
+      },
+      "description": "Metadata for the native currency (msg.value) sent with a payable call. Always denominated in wei and rendered as the eth semantic type."
     },
     "Type": {
       "oneOf": [

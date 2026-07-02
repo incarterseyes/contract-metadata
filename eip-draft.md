@@ -131,7 +131,7 @@ Long-form context -- history, multi-paragraph explanations, and Markdown formatt
 
 Actions are keyed by a free-form identifier matching `^[a-zA-Z_][a-zA-Z0-9_-]*$`. The identifier is not constrained to ABI names -- it is the UI-facing label used for routing, cross-references, and variant distinction (e.g. `approve`, `approve-max`, `revoke`).
 
-Each action MUST declare a `function` field that references the ABI function it invokes. The `function` value is keyed by one of three formats:
+Each action resolves to the ABI function it invokes through its `function` field. When `function` is omitted, the action's id is used as the reference, so it MUST then be a valid bare function name. The `function` value uses one of three formats:
 
 | Format            | When to use                  | Example                                             |
 | ----------------- | ---------------------------- | --------------------------------------------------- |
@@ -190,10 +190,11 @@ Each action entry MAY include the following fields. When the action's `function`
 - `group` (string): Key referencing a named group in the `groups` object.
 - `warning` (string): Cautionary text displayed to the user.
 - `featured` (boolean): If `true`, highlights this as a primary action.
-- `hidden` (boolean): If `true`, suppresses the action from the default UI. Also used to suppress an ABI-synthesized default when only authored variants should render.
+- `hidden` (boolean): If `true`, suppresses the action from the default UI. If every authored action referencing a function is hidden, the function itself is hidden (no default is synthesized for it -- see [ABI-Synthesized Default Actions](#abi-synthesized-default-actions)).
 - `intent` (string): Human-readable sentence template rendered with formatted parameter values.
 - `related` (array of strings): Action identifiers of related actions.
 - `params` (object): Per-parameter metadata, keyed by ABI parameter name.
+- `value` (object): Metadata for the native currency (`msg.value`) sent with the call -- see [Transaction Value](#transaction-value).
 
 #### Variant Actions
 
@@ -237,13 +238,33 @@ Multiple actions MAY target the same ABI function with different presets. This i
 }
 ```
 
-Consumers SHOULD render each action as a distinct UI entry. When a calldata is decoded and multiple actions could match (same selector, some with preset params), consumers SHOULD prefer the most specific match (the variant with the most locked parameters matching the decoded args).
+Consumers SHOULD render each action as a distinct UI entry. Authors SHOULD keep a base action (no locked parameters) alongside the variants when the generic form is still a sensible user intent, as `approve` is above.
+
+#### Matching Calldata to Actions
+
+Consumers that decode existing transactions (confirmation previews, history views, explorers) SHOULD resolve decoded calldata to the most specific action:
+
+1. **Candidates.** Resolve each action's function reference to a 4-byte selector. Actions whose selector matches the calldata's selector are candidates.
+2. **Locked parameters.** A parameter is _locked_ when it sets `hidden` or `disabled` and its `autofill` resolves to a value knowable at matching time. Each locked parameter is an equality constraint against the corresponding decoded argument:
+
+   | Autofill                            | Constraint                                    |
+   | ----------------------------------- | --------------------------------------------- |
+   | `{ "type": "constant", "value": v }` | argument equals `v`                          |
+   | `zero-address`                      | argument equals `0x000...000`                 |
+   | `contract-address`                  | argument equals the described contract        |
+   | `connected-address`                 | argument equals the transaction sender        |
+   | `block-timestamp`                   | none -- MUST NOT be used as a constraint      |
+
+3. **Selection.** Discard candidates with any failed constraint. Of the remainder, select the candidate with the most locked parameters. Break ties by lowest `order`, then by lexicographically smallest action id, so that selection is deterministic across consumers.
+4. **Fallback.** If no candidate remains, fall back to an ABI-synthesized default for the function.
+
+A base action with no locked parameters never fails a constraint, so it acts as the natural fallback for calldata that matches no variant's presets. Matching selects a *presentation* -- it is not a security guarantee, and consumers SHOULD still surface the underlying function signature (see Security Considerations).
 
 #### ABI-Synthesized Default Actions
 
-Consumers with access to the ABI SHOULD synthesize a default action for every function the ABI declares that has no authored action. The synthesized default uses the function name as its identifier (or a name-plus-types slug for overloaded functions) and carries no metadata beyond what is derivable from the ABI.
+Consumers with access to the ABI SHOULD ensure every ABI function is reachable: for each function that no authored action references, synthesize a default action carrying no metadata beyond what is derivable from the ABI. Synthesized defaults exist per ABI function (per selector), are consumer-internal, and are never referenced by `related` or other authored cross-references.
 
-An authored action with identifier equal to the synthesized default's identifier replaces the default. An authored action with a different identifier is a variant -- the default still renders unless the authored action sets `hidden: true` on the canonical identifier.
+Once any authored action references a function, no default is synthesized for that function -- the authored actions are its complete representation. Authors who want both curated variants and a plain generic form SHOULD author a base action alongside the variants (as the ERC-20 interface does with `approve` next to `approve-max` and `revoke`). Authors who want a function fully suppressed author a single action for it with `hidden: true`.
 
 #### Parameter Input Flags
 
@@ -255,6 +276,34 @@ Parameters in an action MAY set two input-side flags that control how the input 
 | `disabled` | Render the input but make it non-editable; display the autofilled value. REQUIRES `autofill`.         |
 
 `hidden: true` and `disabled: true` are mutually exclusive. The input-side `hidden` is distinct from the display-side `type: "hidden"` semantic type -- one controls whether an input is rendered for writes, the other controls whether a value is rendered in read contexts.
+
+#### Transaction Value
+
+The arguments of a payable call do not fully describe it -- the native currency sent along (`msg.value`) is part of the user's intent too. Actions on payable functions MAY describe it with a `value` object, which supports `label`, `description`, `autofill`, `hidden`, `disabled`, and `validation` with the same semantics as parameters. The value is always denominated in wei and rendered as the `eth` semantic type.
+
+```json
+{
+  "actions": {
+    "deposit": {
+      "title": "Wrap ETH",
+      "intent": "Wrap {value} into WETH",
+      "value": {
+        "label": "Amount",
+        "description": "The amount of ETH to wrap"
+      }
+    },
+    "mint": {
+      "title": "Mint (0.01 ETH)",
+      "value": {
+        "autofill": { "type": "constant", "value": "10000000000000000" },
+        "disabled": true
+      }
+    }
+  }
+}
+```
+
+Without a `value` object, consumers SHOULD render a generic amount input for payable functions. A locked `value` (hidden or disabled with a resolvable autofill) participates in [calldata matching](#matching-calldata-to-actions) as an equality constraint against the transaction's value. The `{value}` placeholder in intent templates refers to the transaction value when the action declares a `value` object and the ABI declares no parameter named `value`; an ABI parameter of that name takes precedence.
 
 ### Semantic Types
 
@@ -528,6 +577,10 @@ Bare names are the common case and the most readable. Signatures are needed for 
 ### Why decouple actions from ABI functions?
 
 Keying metadata directly by ABI name creates a 1:1 coupling that cannot express common user intents. "Revoke Approval" is conceptually distinct from "Approve" in the user's mental model, but both compile down to the same `approve(address,uint256)` call with different arguments. Decoupling actions from ABI functions lets publishers express these intents as first-class UI entries with their own title, warning, intent template, and locked parameter values -- while still resolving to the correct ABI function at call time. It also unlocks calldata-to-action matching for transaction previews.
+
+### Why describe `msg.value`?
+
+A payable call is not fully described by its arguments -- `WETH.deposit()` takes no parameters at all, yet the single most important fact about it is how much ETH is attached. Without a `value` object, the best a publisher can do is warn about it in prose, which no wallet can render as an input or verify in a preview. Treating transaction value like a parameter (same label/autofill/lock semantics) closes that gap with no new concepts.
 
 ## Backwards Compatibility
 
