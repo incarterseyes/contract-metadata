@@ -41,7 +41,8 @@
     },
     "description": {
       "type": "string",
-      "description": "Description of the contract (ERC-7572: description)."
+      "maxLength": 120,
+      "description": "One short sentence describing the contract (ERC-7572: description). Put long-form context in about."
     },
     "image": {
       "type": "string",
@@ -261,7 +262,8 @@
         },
         "description": {
           "type": "string",
-          "description": "Optional description of what this group contains."
+          "maxLength": 120,
+          "description": "One short sentence describing what this group contains."
         },
         "order": {
           "type": "integer",
@@ -294,7 +296,8 @@
         },
         "description": {
           "type": "string",
-          "description": "What the action does, explained for end users."
+          "maxLength": 120,
+          "description": "One short sentence on what the action does, for end users. Put long-form detail in the contract's about."
         },
         "intent": {
           "type": "string",
@@ -374,7 +377,8 @@
         },
         "description": {
           "type": "string",
-          "description": "What signing this message does, explained for end users."
+          "maxLength": 120,
+          "description": "One short sentence on what signing this message does, for end users."
         },
         "intent": {
           "type": "string",
@@ -413,7 +417,8 @@
         },
         "description": {
           "type": "string",
-          "description": "What this event signifies."
+          "maxLength": 120,
+          "description": "One short sentence on what this event signifies."
         },
         "params": {
           "type": "object",
@@ -444,7 +449,8 @@
         },
         "description": {
           "type": "string",
-          "description": "What this error means and when it occurs."
+          "maxLength": 120,
+          "description": "One short sentence on what this error means and when it occurs."
         },
         "params": {
           "type": "object",
@@ -470,7 +476,8 @@
         },
         "description": {
           "type": "string",
-          "description": "What this parameter represents."
+          "maxLength": 120,
+          "description": "One short sentence on what this parameter represents."
         },
         "type": {
           "$ref": "#/$defs/Type",
@@ -501,7 +508,7 @@
         {
           "type": "string",
           "enum": ["eth", "gwei", "timestamp", "address", "boolean", "blocknumber", "duration", "bytes32-utf8", "token-id", "percentage", "basis-points", "token-amount", "date", "datetime", "hidden"],
-          "description": "Semantic type. Tells consumers what a value represents and how to render it in both read and write contexts."
+          "description": "Semantic type. Tells consumers what a value represents and how to render it in both read and write contexts. Amount-like types share one contract (display = raw / 10^decimals, rendered with a symbol): \"eth\" is a raw wei value shown as ETH (decimals 18); \"gwei\" is a raw wei value shown as gwei (decimals 9)."
         },
         {
           "type": "object",
@@ -535,6 +542,25 @@
             }
           },
           "description": "Token amount for a specific ERC-20, ERC-721, or ERC-1155. Display: format with decimals and symbol. Input: show balance and max button."
+        },
+        {
+          "type": "object",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "type": { "const": "amount" },
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 18,
+              "description": "Fixed-point decimals. Display value = raw / 10^decimals. Default: 18."
+            },
+            "symbol": {
+              "type": "string",
+              "description": "Unit label shown after the value (e.g. \"USD\"). Optional."
+            }
+          },
+          "description": "Generic fixed-point amount with no asset identity (oracle prices, share prices, accounting units). For native ETH use \"eth\"; for a real token use \"token-amount\"."
         },
         {
           "type": "object",

@@ -1,0 +1,366 @@
+{
+  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "chainId": 1,
+  "address": "0x74806bce19ba454d13595f4313e7d7a7e6a36878",
+  "meta": {
+    "version": 1,
+    "lastUpdated": "2026-06-20T00:00:00Z",
+    "locale": "en"
+  },
+  "name": "Hello World Computer",
+  "symbol": "HWC",
+  "description": "The one-of-one onchain artwork of the Hello World Computer: a WebGL particle field driven by its yes/no tallies.",
+  "about": "## The computer's one-of-one artwork\n\nThis is the single, unique artwork tied to the Hello World Computer. There is exactly one — no editions, no copies. The piece is generated entirely onchain: calling `artpiece()` returns a complete HTML and WebGL2 document that renders a living particle field. The artwork reads the computer's current yes and no answer tallies and uses them to size its two particle states, so the image evolves as the computer learns.\n\n## Owning and trading it\n\nOwnership uses a minimal, self-contained marketplace in the spirit of CryptoPunks rather than a standard ERC-721. The current owner can list it for sale at a fixed ETH price — open to anyone, or reserved for one specific address — and can cancel a listing or hand the piece directly to someone with `transferOwnership`. A buyer takes it by calling `buyNow()` with exactly the asking price. The full sale price goes to the seller, who collects it with `withdraw()`.\n\n## Not a standard NFT\n\nBecause ownership is tracked by this contract's own logic, the artwork may not appear or move like a normal token in wallets and marketplaces that expect ERC-721. It exposes `name()` (\"Hello World Computer\") and `symbol()` (\"HWC\") for display, and `owner()` for the current holder.",
+  "category": "nft",
+  "tags": [
+    "art",
+    "generative-art",
+    "onchain",
+    "one-of-one",
+    "webgl",
+    "marketplace"
+  ],
+  "links": [
+    {
+      "label": "Etherscan",
+      "url": "https://etherscan.io/address/0x74806BCe19BA454d13595F4313E7d7A7E6a36878"
+    },
+    {
+      "label": "Computer",
+      "url": "https://etherscan.io/address/0x6901afceb66564a9b6E7193561fB78F0878b5906"
+    },
+    {
+      "label": "ENS",
+      "url": "https://app.ens.domains/artifact.helloworldcomputer.eth"
+    }
+  ],
+  "risks": [
+    "This is a single one-of-one artwork with a custom ownership model — it is not a standard ERC-721 and may not appear or transfer like one in wallets and marketplaces.",
+    "Buying requires sending exactly the asking price; any other amount reverts.",
+    "A listing can be reserved for one specific buyer — anyone else calling buyNow reverts.",
+    "Sale proceeds are pull-based: the seller must call withdraw() to collect them.",
+    "Transferring ownership moves the artwork with no payment and clears any active listing.",
+    "Listing, cancelling, and transferring are restricted to the current owner."
+  ],
+  "theme": {
+    "background": "#ffffff",
+    "text": "#111111",
+    "accent": "#484848"
+  },
+  "groups": {
+    "market": {
+      "label": "Marketplace",
+      "order": 1
+    },
+    "ownership": {
+      "label": "Ownership",
+      "order": 2
+    },
+    "artwork": {
+      "label": "Artwork",
+      "order": 3
+    },
+    "payments": {
+      "label": "Payments",
+      "order": 4
+    }
+  },
+  "actions": {
+    "buyNow": {
+      "title": "Buy Now",
+      "description": "Buy the artwork at its current asking price by sending exactly the listed ETH, which is credited to the seller.",
+      "group": "market",
+      "order": 1,
+      "featured": true,
+      "warning": "Send exactly the asking price (see Current Offer). If the listing is reserved for a specific address, only that address can buy.",
+      "related": [
+        "currentOffer",
+        "listForSale"
+      ]
+    },
+    "listForSale": {
+      "title": "List for Sale",
+      "description": "List the artwork for sale at a fixed ETH price, open to anyone or reserved for one buyer; owner only.",
+      "intent": "List the artwork for {salePriceInWei}",
+      "group": "market",
+      "order": 2,
+      "warning": "Owner only. The price must be greater than zero. Listing replaces any existing offer.",
+      "params": {
+        "salePriceInWei": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "description": "Restrict the sale to this address, or use the zero address to sell to anyone.",
+          "type": "address",
+          "autofill": "zero-address"
+        }
+      },
+      "related": [
+        "buyNow",
+        "cancelFromSale",
+        "currentOffer"
+      ]
+    },
+    "cancelFromSale": {
+      "title": "Cancel Listing",
+      "description": "Take the artwork off the market, removing any active offer. Only the current owner can cancel.",
+      "group": "market",
+      "order": 3,
+      "warning": "Owner only.",
+      "related": [
+        "listForSale",
+        "currentOffer"
+      ]
+    },
+    "currentOffer": {
+      "title": "Current Offer",
+      "description": "The artwork's current sale offer: whether it is for sale, the asking price, and any reserved buyer.",
+      "stateMutability": "view",
+      "group": "market",
+      "order": 4,
+      "returns": {
+        "active": {
+          "label": "For sale",
+          "type": "boolean"
+        },
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
+      },
+      "related": [
+        "buyNow",
+        "listForSale"
+      ]
+    },
+    "owner": {
+      "title": "Owner",
+      "description": "The current owner of the artwork.",
+      "stateMutability": "view",
+      "group": "ownership",
+      "order": 1,
+      "returns": {
+        "_0": {
+          "label": "Owner",
+          "type": "address"
+        }
+      },
+      "related": [
+        "transferOwnership"
+      ]
+    },
+    "transferOwnership": {
+      "title": "Transfer Ownership",
+      "description": "Hand the artwork to another address off-market with no payment, clearing any active listing; owner only.",
+      "intent": "Give the artwork to {newOwner}",
+      "group": "ownership",
+      "order": 2,
+      "warning": "Owner only. This is a gift — no ETH changes hands — and it cancels any active listing.",
+      "params": {
+        "newOwner": {
+          "label": "New owner",
+          "type": "address"
+        }
+      },
+      "related": [
+        "owner"
+      ]
+    },
+    "artpiece": {
+      "title": "Artwork",
+      "description": "The full HTML and WebGL2 artwork document, generated onchain and embedding the computer's current yes/no tallies.",
+      "stateMutability": "view",
+      "group": "artwork",
+      "order": 1,
+      "returns": {
+        "_0": {
+          "label": "HTML document"
+        }
+      },
+      "related": [
+        "computer"
+      ]
+    },
+    "computer": {
+      "title": "Computer",
+      "description": "The Hello World Computer this artwork belongs to and reads its tallies from.",
+      "stateMutability": "view",
+      "group": "artwork",
+      "order": 2,
+      "returns": {
+        "_0": {
+          "label": "Computer",
+          "type": "address"
+        }
+      },
+      "related": [
+        "artpiece"
+      ]
+    },
+    "name": {
+      "title": "Name",
+      "description": "The artwork's name: \"Hello World Computer\".",
+      "stateMutability": "pure",
+      "group": "artwork",
+      "order": 3
+    },
+    "symbol": {
+      "title": "Symbol",
+      "description": "The artwork's symbol: \"HWC\".",
+      "stateMutability": "pure",
+      "group": "artwork",
+      "order": 4
+    },
+    "pendingWithdrawals": {
+      "title": "Pending Balance",
+      "description": "Sale proceeds the contract is holding for an address, waiting to be collected.",
+      "stateMutability": "view",
+      "group": "payments",
+      "order": 1,
+      "params": {
+        "account": {
+          "label": "Account",
+          "type": "address"
+        }
+      },
+      "returns": {
+        "_0": {
+          "label": "Pending",
+          "type": "eth"
+        }
+      },
+      "related": [
+        "withdraw"
+      ]
+    },
+    "withdraw": {
+      "title": "Withdraw",
+      "description": "Collect the sale proceeds owed to you from a completed sale.",
+      "group": "payments",
+      "order": 2,
+      "related": [
+        "pendingWithdrawals"
+      ]
+    }
+  },
+  "events": {
+    "ArtifactCreated": {
+      "title": "Artwork Created",
+      "description": "Emitted once when the artwork is created and its first owner is set.",
+      "params": {
+        "creator": {
+          "label": "First owner",
+          "type": "address"
+        }
+      }
+    },
+    "ArtifactTransferred": {
+      "title": "Ownership Transferred",
+      "description": "Emitted when the artwork changes hands, whether by sale or direct transfer.",
+      "params": {
+        "oldOwner": {
+          "label": "From",
+          "type": "address"
+        },
+        "newOwner": {
+          "label": "To",
+          "type": "address"
+        }
+      }
+    },
+    "ListedForSale": {
+      "title": "Listed for Sale",
+      "description": "Emitted when the artwork is put up for sale.",
+      "params": {
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "fromAddress": {
+          "label": "Seller",
+          "type": "address"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
+      }
+    },
+    "Unlist": {
+      "title": "Listing Cancelled",
+      "description": "Emitted when an active listing is removed.",
+      "params": {
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "fromAddress": {
+          "label": "Seller",
+          "type": "address"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
+      }
+    },
+    "Sale": {
+      "title": "Sold",
+      "description": "Emitted when the artwork is sold.",
+      "params": {
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "fromAddress": {
+          "label": "Seller",
+          "type": "address"
+        },
+        "toAddress": {
+          "label": "Buyer",
+          "type": "address"
+        }
+      }
+    }
+  },
+  "errors": {
+    "FundsTransfer": {
+      "title": "Transfer Failed",
+      "description": "An ETH transfer failed. Ensure your address can receive ETH."
+    },
+    "InsufficientFunds": {
+      "title": "Wrong Amount",
+      "description": "The ETH sent does not match the asking price, or there is no balance to withdraw."
+    },
+    "ListedForSaleToSpecificAddress": {
+      "title": "Reserved Sale",
+      "description": "This listing is reserved for a specific buyer, and you are not that address."
+    },
+    "NotForSale": {
+      "title": "Not for Sale",
+      "description": "The artwork is not currently listed for sale."
+    },
+    "NotOwner": {
+      "title": "Not the Owner",
+      "description": "Only the current owner can perform this action."
+    },
+    "NullAddress": {
+      "title": "Zero Address",
+      "description": "The artwork cannot be transferred to the zero address."
+    },
+    "PriceTooHigh": {
+      "title": "Price Too High",
+      "description": "The sale price exceeds the maximum the contract can store."
+    },
+    "PriceTooLow": {
+      "title": "Price Too Low",
+      "description": "The sale price must be greater than zero."
+    }
+  }
+}

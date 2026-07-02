@@ -38,7 +38,7 @@
   "actions": {
     "mint": {
       "title": "Mint Original",
-      "description": "Mint Checks Originals by burning the corresponding Edition tokens. Each Original is created fully onchain with the same token ID as the burned Edition. This is the only way new Originals enter existence.",
+      "description": "Mint Checks Originals by burning the corresponding Edition tokens, minting each Original onchain with the same token ID.",
       "group": "minting",
       "params": {
         "tokenIds": {
@@ -101,7 +101,7 @@
     },
     "composite": {
       "title": "Composite",
-      "description": "Burn two Checks of the same tier to create one Check of the next tier (e.g. two 80-checks become one 40-check). The kept token ID carries forward.",
+      "description": "Burn two Checks of the same tier to create one of the next tier; the kept token ID carries forward.",
       "intent": "Composite Check #{tokenId} with #{burnId}",
       "group": "compositing",
       "warning": "Permanently burns one token. The burn cannot be reversed.",
@@ -119,7 +119,7 @@
         },
         "swap": {
           "label": "swap visual",
-          "description": "By default, the kept token's colors carry into the composite. Enable swap to use the burned token's colors instead — the kept token ID survives, but it looks like the burned one"
+          "description": "Use the burned token's colors instead of the kept token's; the kept token ID survives but takes the burned look."
         }
       },
       "related": ["simulateComposite", "compositeMany", "getCheck"]
@@ -166,7 +166,7 @@
     },
     "infinity": {
       "title": "Infinity (Black Check)",
-      "description": "Burn 64 single-check tokens to create a Black Check — the rarest possible outcome. Given the original supply of 16,031, at most 3 could ever be created.",
+      "description": "Burn 64 single-check tokens to create a Black Check, the rarest outcome — at most 3 can ever exist.",
       "intent": "Burn 64 single-check tokens to create a Black Check",
       "group": "compositing",
       "warning": "Irreversibly burns 64 single-check tokens. Requires all tokens to be single-checks.",
@@ -180,7 +180,7 @@
     },
     "inItForTheArt": {
       "title": "Sacrifice",
-      "description": "Sacrifice one Check to transfer its visual identity to another. Burns the sacrificed token and overwrites the receiving token's visual genome.",
+      "description": "Sacrifice one Check to overwrite another's visual identity, burning the sacrificed token.",
       "intent": "Sacrifice Check #{burnId} to transfer its visual to #{tokenId}",
       "group": "compositing",
       "warning": "Permanently burns the sacrificed token.",
@@ -221,7 +221,7 @@
     },
     "resolveEpochIfNecessary": {
       "title": "Resolve Epoch",
-      "description": "Resolves the current epoch using a commit-reveal scheme. Epochs seed the randomness that determines a token's visual traits upon migration. Called automatically when needed but can be triggered manually.",
+      "description": "Resolve the current epoch via commit-reveal, seeding the randomness for token traits; usually automatic.",
       "group": "info"
     },
     "getEpoch": {

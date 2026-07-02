@@ -91,6 +91,12 @@ The following fields provide context about the contract itself. The fields `name
 | `errors`    | `object` | OPTIONAL | Per-error metadata, keyed by name, signature, or 4-byte selector         |
 | `messages`  | `object` | OPTIONAL | EIP-712 typed message metadata, keyed by primary type name               |
 
+### Description Length
+
+Every `description` field -- whether on the contract, an action, event, error, message, group, or parameter -- SHOULD be a single, plain-language sentence and MUST NOT exceed **120 characters**. Descriptions are rendered in space-constrained UI such as tooltips, list rows, and transaction previews, so they must stay short and scannable.
+
+Long-form context -- history, multi-paragraph explanations, and Markdown formatting -- belongs in the contract-level `about` field, which has no length limit. Do not pack paragraphs into `description`.
+
 ### Contract-Level Example
 
 ```json
@@ -180,7 +186,7 @@ Each action entry MAY include the following fields. When the action's `function`
 - `function` (string, OPTIONAL): The ABI function this action invokes. Accepts a bare name, full signature, or 4-byte selector. When omitted, the action's id is used as the reference — so `"approve": { ... }` is equivalent to `"approve": { "function": "approve", ... }`. Variants whose id differs from the underlying function (e.g. `"revoke": { "function": "approve", ... }`) MUST set this field.
 - `order` (integer): Display order within the action's group. Lower numbers appear first. Actions without an `order` are sorted after ordered ones.
 - `title` (string): Human-readable title for the action.
-- `description` (string): Longer explanation of what the action does.
+- `description` (string): A single short sentence explaining what the action does (max 120 characters -- see [Description Length](#description-length)).
 - `group` (string): Key referencing a named group in the `groups` object.
 - `warning` (string): Cautionary text displayed to the user.
 - `featured` (boolean): If `true`, highlights this as a primary action.
@@ -258,8 +264,8 @@ The `type` field on a parameter is a semantic annotation that tells consumers wh
 
 | Type           | Meaning                                                           |
 | -------------- | ----------------------------------------------------------------- |
-| `eth`          | Value in wei, represents an ETH amount                            |
-| `gwei`         | Value in gwei                                                     |
+| `eth`          | Raw wei value, displayed as ETH (18 decimals) -- see Amount-like Types |
+| `gwei`         | Raw wei value, displayed as gwei (9 decimals)                     |
 | `timestamp`    | Unix timestamp (display: formatted date, input: date picker)      |
 | `address`      | Ethereum address (with ENS resolution)                            |
 | `boolean`      | Boolean value                                                     |
@@ -285,6 +291,9 @@ Types that need additional configuration MUST use an object form:
 // Token amount for a specific token
 { "type": "token-amount", "tokenAddress": "0x..." }
 
+// Generic fixed-point amount (oracle price, share price, accounting unit)
+{ "type": "amount", "decimals": 8, "symbol": "USD" }
+
 // Token ID for a specific NFT collection
 { "type": "token-id", "tokenAddress": "0x..." }
 
@@ -294,6 +303,19 @@ Types that need additional configuration MUST use an object form:
 // Slider -- input: render as range slider
 { "type": "slider", "min": "0", "max": "9999", "step": "1" }
 ```
+
+#### Amount-like Types
+
+`eth`, `gwei`, `token-amount`, and `amount` share one formatting contract -- **display value = raw integer / 10^decimals**, rendered with a symbol. They differ only in where `decimals` and `symbol` come from:
+
+| Type           | decimals                       | symbol                  | asset                   |
+| -------------- | ------------------------------ | ----------------------- | ----------------------- |
+| `eth`          | 18 (fixed)                     | ETH (fixed)             | native                  |
+| `gwei`         | 9 (fixed)                      | gwei (fixed)            | native                  |
+| `token-amount` | on-chain `decimals()`          | on-chain `symbol()`     | token at `tokenAddress` |
+| `amount`       | `decimals` field (default 18)  | optional `symbol` field | none                    |
+
+Use `eth` or `token-amount` when the asset has an identity; use `amount` only for fixed-point numbers with no asset -- oracle outputs, share prices, internal accounting units.
 
 ### Autofill
 

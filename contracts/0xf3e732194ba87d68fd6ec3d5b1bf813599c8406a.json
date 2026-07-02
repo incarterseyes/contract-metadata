@@ -9,7 +9,7 @@
   },
   "name": "Mnemonic",
   "symbol": "M",
-  "description": "Mnemonic is a single-edition generative artwork stored entirely onchain. The contract holds the complete WebGL source code and an HTML renderer, making the piece permanently accessible from the blockchain without external dependencies. A built-in marketplace allows the owner to list the work for sale or accept bids, with configurable royalties paid to the artist on every sale.",
+  "description": "A single-edition generative artwork stored fully onchain, with a built-in marketplace for bids and sales.",
   "about": "## About the artpiece\n\nMnemonic (2024) is a one-of-one generative work by Han Saglam, realized entirely within an Ethereum smart contract. The piece renders an interactive three-dimensional environment through WebGL shaders that responds to the viewer's gesture — inviting a shift in perspective through direct manipulation. Both the source code and its HTML renderer are stored permanently onchain, making the work self-contained and independent of any external infrastructure. Mnemonic reflects Saglam's ongoing inquiry into digital permanence and the blockchain as artistic medium, foregrounding absence and presence as a conceptual axis.\n\n## About the artist\n\nHan Saglam is an artist pioneering the world computer as an artistic medium, working through generative systems, smart contracts, data, and machine intelligence. His practice concentrates on autonomous systems and digital permanence — exploring how code functions as art. Works held in permanent collections at LACMA and Dataland Museum, and pieces have exceeded estimates at Sotheby's and Christie's.\n\n## Built-in marketplace\n\nThe contract includes a native marketplace for trading the artwork. The owner can list it for sale at a fixed price (publicly or to a specific address), and anyone can place bids. A configurable royalty percentage is paid to the royalty recipient on every sale or accepted bid. Sale proceeds and outbid returns are credited to pending withdrawals and must be claimed manually.",
   "risks": [
     "No upgradeability — contract logic is permanent and cannot be patched",
@@ -120,7 +120,7 @@
     },
     "buyNow": {
       "title": "Buy Now",
-      "description": "Purchase the artwork at the listed price. The piece must be currently listed for sale, and the exact asking price must be sent as ETH.",
+      "description": "Purchase the artwork at its listed price by sending the exact asking amount in ETH while it is for sale.",
       "intent": "Buy Mnemonic for the listed price",
       "group": "marketplace",
       "featured": true,
@@ -129,7 +129,7 @@
     },
     "placeBid": {
       "title": "Place Bid",
-      "description": "Place a bid on the artwork. Must be higher than the current bid. Your ETH is held in the contract until the bid is accepted or you withdraw it.",
+      "description": "Place a bid on the artwork above the current bid; your ETH is held until the bid is accepted or withdrawn.",
       "intent": "Place a bid on Mnemonic",
       "group": "marketplace",
       "warning": "Your ETH will be locked in the contract until the owner accepts or you withdraw.",
@@ -137,7 +137,7 @@
     },
     "acceptBid": {
       "title": "Accept Bid",
-      "description": "Accept the current highest bid. The artwork is transferred to the bidder and the bid amount (minus royalty) is credited to the owner's pending withdrawals. Only the owner can call this.",
+      "description": "Accept the current highest bid, sending the artwork to the bidder and crediting the owner the bid minus royalty.",
       "group": "marketplace",
       "related": ["currentBid", "placeBid"]
     },
@@ -199,7 +199,7 @@
     },
     "transferOwnership": {
       "title": "Transfer Ownership",
-      "description": "Transfer the artwork to another address without going through the marketplace. Bypasses royalties. If the new owner has an active bid, it is refunded. Any active sale listing is canceled.",
+      "description": "Transfer the artwork off-market to another address, bypassing royalties and canceling any active listing or bid.",
       "intent": "Transfer Mnemonic to {newOwner}",
       "group": "admin",
       "warning": "This is a direct transfer with no payment involved. Royalties are not collected. Make sure you intend to send the artwork for free.",
