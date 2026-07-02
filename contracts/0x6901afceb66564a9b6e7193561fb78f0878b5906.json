@@ -12,7 +12,14 @@
   "description": "An onchain neural network that learns from yes/no questions, training one shared perceptron from paid answers.",
   "about": "## A mind built from yes and no\n\nThe Hello World Computer is an onchain neural network — a single shared perceptron that starts knowing nothing. Everything it comes to lean toward, someone taught it through yes-or-no questions.\n\n## Asking and answering\n\nAnyone can ask a question for a flat 0.01 ETH fee. Each question is deployed as its own *Binary* contract and joins a queue. People answer questions yes or no by attaching ETH — the more ETH, the more weight the answer carries (minimum 0.0001 ETH per answer). While a question waits in line, every answer it receives raises its standing.\n\n## The lifecycle\n\nRoughly every 10 minutes the highest-activity question in the queue is promoted into the live set. Up to 150 questions can be live at once and the queue holds up to 2,048. A live question stays active for about 25 hours. Anyone can call `push()` to move the machine forward: it settles the oldest live question that has finished its run, then promotes the next one. Whoever triggers a promotion earns a small 0.0001 ETH bounty.\n\n## Learning and payouts\n\nWhen a question settles, its accumulated answer fees are split 90% to the question's creator and 10% to the protocol, and the question teaches the shared perceptron exactly once — nudging the computer's 1,024 feature weights toward the net yes/no lean it received. You can read the whole mind at any time with `featureStates()`, or ask it what it makes of a new message with `ask()`.\n\n## Payments are pull-based\n\nCreator cuts, promotion bounties, and protocol cuts accumulate as pending balances. Call `withdraw()` to collect what the computer owes you. The contract has no owner controls, no upgrade path, and no pause — the rules are fixed at deployment.",
   "category": "ai",
-  "tags": ["neural-network", "perceptron", "onchain-ai", "machine-learning", "generative-art", "experimental"],
+  "tags": [
+    "neural-network",
+    "perceptron",
+    "onchain-ai",
+    "machine-learning",
+    "generative-art",
+    "experimental"
+  ],
   "links": [
     {
       "label": "Etherscan",
@@ -42,13 +49,28 @@
     "accent": "#484848"
   },
   "groups": {
-    "interact": { "label": "Interact", "order": 1 },
-    "mind": { "label": "The Mind", "order": 2 },
-    "stats": { "label": "Stats", "order": 3 },
-    "payments": { "label": "Payments", "order": 4 },
-    "artwork": { "label": "Artwork", "order": 5 }
+    "interact": {
+      "label": "Interact",
+      "order": 1
+    },
+    "mind": {
+      "label": "The Mind",
+      "order": 2
+    },
+    "stats": {
+      "label": "Stats",
+      "order": 3
+    },
+    "payments": {
+      "label": "Payments",
+      "order": 4
+    },
+    "artwork": {
+      "label": "Artwork",
+      "order": 5
+    }
   },
-  "functions": {
+  "actions": {
     "deployBinary": {
       "title": "Ask a Question",
       "description": "Ask the computer a question for a flat 0.01 ETH fee, deploying it as its own Binary contract that joins the queue.",
@@ -64,10 +86,19 @@
         }
       },
       "returns": {
-        "id": { "label": "Question ID" },
-        "binaryAddr": { "label": "Question contract", "type": "address" }
+        "id": {
+          "label": "Question ID"
+        },
+        "binaryAddr": {
+          "label": "Question contract",
+          "type": "address"
+        }
       },
-      "related": ["batchAnswer", "push", "ask"]
+      "related": [
+        "batchAnswer",
+        "push",
+        "ask"
+      ]
     },
     "batchAnswer": {
       "title": "Answer Questions",
@@ -82,7 +113,10 @@
           "description": "A list of answers, each a (question address, yes/no, ETH weight) triple. Minimum 0.0001 ETH per answer."
         }
       },
-      "related": ["deployBinary", "push"]
+      "related": [
+        "deployBinary",
+        "push"
+      ]
     },
     "push": {
       "title": "Advance the Computer",
@@ -90,7 +124,10 @@
       "group": "interact",
       "order": 3,
       "warning": "Whoever triggers a promotion earns a 0.0001 ETH bounty. If nothing is due to settle or promote, the call simply does nothing.",
-      "related": ["deployBinary", "batchAnswer"]
+      "related": [
+        "deployBinary",
+        "batchAnswer"
+      ]
     },
     "ask": {
       "title": "Read the Mind",
@@ -122,7 +159,10 @@
           "description": "How strongly the computer leans, as a signed margin. Larger magnitude means a stronger conviction."
         }
       },
-      "related": ["featureStates", "totalResponses"]
+      "related": [
+        "featureStates",
+        "totalResponses"
+      ]
     },
     "featureStates": {
       "title": "Feature Weights",
@@ -131,9 +171,14 @@
       "group": "mind",
       "order": 2,
       "returns": {
-        "_0": { "label": "Weights" }
+        "_0": {
+          "label": "Weights"
+        }
       },
-      "related": ["ask", "totalResponses"]
+      "related": [
+        "ask",
+        "totalResponses"
+      ]
     },
     "totalBinaries": {
       "title": "Total Questions",
@@ -156,8 +201,12 @@
       "group": "stats",
       "order": 3,
       "returns": {
-        "positive": { "label": "Yes weight" },
-        "negative": { "label": "No weight" }
+        "positive": {
+          "label": "Yes weight"
+        },
+        "negative": {
+          "label": "No weight"
+        }
       }
     },
     "pendingWithdrawals": {
@@ -167,19 +216,29 @@
       "group": "payments",
       "order": 1,
       "params": {
-        "account": { "label": "Account", "type": "address" }
+        "account": {
+          "label": "Account",
+          "type": "address"
+        }
       },
       "returns": {
-        "_0": { "label": "Pending", "type": "eth" }
+        "_0": {
+          "label": "Pending",
+          "type": "eth"
+        }
       },
-      "related": ["withdraw"]
+      "related": [
+        "withdraw"
+      ]
     },
     "withdraw": {
       "title": "Withdraw",
       "description": "Collect everything the computer owes you: creator cuts, promotion bounties, and any protocol cuts.",
       "group": "payments",
       "order": 2,
-      "related": ["pendingWithdrawals"]
+      "related": [
+        "pendingWithdrawals"
+      ]
     },
     "artifact": {
       "title": "Artwork Address",
@@ -188,9 +247,15 @@
       "group": "artwork",
       "order": 1,
       "returns": {
-        "_0": { "label": "Artwork", "type": "address" }
+        "_0": {
+          "label": "Artwork",
+          "type": "address"
+        }
       },
-      "related": ["owner", "currentOffer"]
+      "related": [
+        "owner",
+        "currentOffer"
+      ]
     },
     "owner": {
       "title": "Artwork Owner",
@@ -199,9 +264,15 @@
       "group": "artwork",
       "order": 2,
       "returns": {
-        "_0": { "label": "Owner", "type": "address" }
+        "_0": {
+          "label": "Owner",
+          "type": "address"
+        }
       },
-      "related": ["artifact", "currentOffer"]
+      "related": [
+        "artifact",
+        "currentOffer"
+      ]
     },
     "currentOffer": {
       "title": "Artwork Offer",
@@ -210,19 +281,36 @@
       "group": "artwork",
       "order": 3,
       "returns": {
-        "active": { "label": "For sale", "type": "boolean" },
-        "value": { "label": "Price", "type": "eth" },
-        "toAddress": { "label": "Reserved buyer", "type": "address" }
+        "active": {
+          "label": "For sale",
+          "type": "boolean"
+        },
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
       },
-      "related": ["artifact", "owner"]
+      "related": [
+        "artifact",
+        "owner"
+      ]
     },
     "onAnswer": {
       "title": "On Answer (internal)",
       "description": "Internal hook, callable only by the computer's own questions, that records an answer against a queued or live question.",
       "hidden": true,
       "params": {
-        "activityDelta": { "label": "Weight" },
-        "yes": { "label": "Yes", "type": "boolean" }
+        "activityDelta": {
+          "label": "Weight"
+        },
+        "yes": {
+          "label": "Yes",
+          "type": "boolean"
+        }
       }
     }
   },
@@ -231,37 +319,70 @@
       "title": "Question Asked",
       "description": "Emitted when a new question is asked and enters the queue.",
       "params": {
-        "id": { "label": "Question ID" },
-        "binary": { "label": "Question contract", "type": "address" },
-        "creator": { "label": "Asked by", "type": "address" },
-        "question": { "label": "Question" }
+        "id": {
+          "label": "Question ID"
+        },
+        "binary": {
+          "label": "Question contract",
+          "type": "address"
+        },
+        "creator": {
+          "label": "Asked by",
+          "type": "address"
+        },
+        "question": {
+          "label": "Question"
+        }
       }
     },
     "BinaryActivated": {
       "title": "Question Went Live",
       "description": "Emitted when a queued question is promoted into the live set.",
       "params": {
-        "id": { "label": "Question ID" },
-        "binary": { "label": "Question contract", "type": "address" }
+        "id": {
+          "label": "Question ID"
+        },
+        "binary": {
+          "label": "Question contract",
+          "type": "address"
+        }
       }
     },
     "BinarySettled": {
       "title": "Question Settled",
       "description": "Emitted when a live question finishes its run: its fees are split 90/10 and its lean is taught to the mind.",
       "params": {
-        "id": { "label": "Question ID" },
-        "binary": { "label": "Question contract", "type": "address" },
-        "creatorCut": { "label": "Creator cut", "type": "eth" },
-        "protocolCut": { "label": "Protocol cut", "type": "eth" },
-        "weight": { "label": "Learned lean", "description": "The question's net yes/no lean taught to the perceptron (signed)." }
+        "id": {
+          "label": "Question ID"
+        },
+        "binary": {
+          "label": "Question contract",
+          "type": "address"
+        },
+        "creatorCut": {
+          "label": "Creator cut",
+          "type": "eth"
+        },
+        "protocolCut": {
+          "label": "Protocol cut",
+          "type": "eth"
+        },
+        "weight": {
+          "label": "Learned lean",
+          "description": "The question's net yes/no lean taught to the perceptron (signed)."
+        }
       }
     },
     "Taught": {
       "title": "Computer Taught",
       "description": "Emitted when a settled question teaches the shared perceptron a lesson.",
       "params": {
-        "messageHash": { "label": "Question hash" },
-        "message": { "label": "Question" },
+        "messageHash": {
+          "label": "Question hash"
+        },
+        "message": {
+          "label": "Question"
+        },
         "label": {
           "label": "Lean",
           "type": {
@@ -272,15 +393,23 @@
             }
           }
         },
-        "teacher": { "label": "Taught by", "type": "address" },
-        "weight": { "label": "Lesson weight" }
+        "teacher": {
+          "label": "Taught by",
+          "type": "address"
+        },
+        "weight": {
+          "label": "Lesson weight"
+        }
       }
     },
     "ArtifactDeployed": {
       "title": "Artwork Deployed",
       "description": "Emitted once at construction, when the companion one-of-one artwork is deployed.",
       "params": {
-        "artifact": { "label": "Artwork", "type": "address" }
+        "artifact": {
+          "label": "Artwork",
+          "type": "address"
+        }
       }
     }
   },

@@ -35,7 +35,7 @@
     "compositing": { "label": "Compositing", "order": 3 },
     "info": { "label": "Token Info", "order": 4 }
   },
-  "functions": {
+  "actions": {
     "mint": {
       "title": "Mint Original",
       "description": "Mint Checks Originals by burning the corresponding Edition tokens, minting each Original onchain with the same token ID.",

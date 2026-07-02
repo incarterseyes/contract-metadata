@@ -115,11 +115,14 @@
         "$ref": "#/$defs/Group"
       }
     },
-    "functions": {
+    "actions": {
       "type": "object",
-      "description": "Per-function metadata. Keys can be a bare ABI name (e.g. \"transfer\"), a full Solidity signature for overloaded functions (e.g. \"safeTransferFrom(address,address,uint256,bytes)\"), or a 4-byte selector for unverified contracts (e.g. \"0xa9059cbb\").",
+      "description": "User-facing actions, keyed by free-form identifier (e.g. \"approve\", \"revoke\", \"my-balance\"). Each action references an ABI function via its `function` field and may preset or lock parameters. Multiple actions may target the same function to provide UX variants.",
+      "propertyNames": {
+        "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]*$"
+      },
       "additionalProperties": {
-        "$ref": "#/$defs/FunctionMeta"
+        "$ref": "#/$defs/ActionMeta"
       }
     },
     "events": {
@@ -269,7 +272,7 @@
         }
       }
     },
-    "FunctionMeta": {
+    "ActionMeta": {
       "type": "object",
       "additionalProperties": false,
       "patternProperties": {
@@ -278,23 +281,27 @@
         }
       },
       "properties": {
+        "function": {
+          "type": "string",
+          "description": "Reference to the ABI function this action invokes. Accepts a bare name (e.g. \"approve\"), a full Solidity signature (e.g. \"approve(address,uint256)\") for overloaded functions, or a 4-byte selector (e.g. \"0x095ea7b3\") for unverified contracts. OPTIONAL: when omitted, the action's id (its key in the `actions` object) is used as the reference — so `\"approve\": { ... }` is equivalent to `\"approve\": { \"function\": \"approve\", ... }`. Variant actions whose id differs from the underlying function (e.g. `\"revoke\": { \"function\": \"approve\", ... }`) MUST set this field explicitly."
+        },
         "order": {
           "type": "integer",
           "minimum": 0,
-          "description": "Display order within the function's group (lower numbers appear first). Functions without an order are sorted after ordered ones."
+          "description": "Display order within the action's group (lower numbers appear first). Actions without an order are sorted after ordered ones."
         },
         "title": {
           "type": "string",
-          "description": "Human-readable function name."
+          "description": "Human-readable action name."
         },
         "description": {
           "type": "string",
           "maxLength": 120,
-          "description": "One short sentence on what the function does, for end users. Put long-form detail in the contract's about."
+          "description": "One short sentence on what the action does, for end users. Put long-form detail in the contract's about."
         },
         "intent": {
           "type": "string",
-          "description": "Template string rendered with formatted parameter values. Use {paramName} placeholders (e.g. \"Transfer {wad} to {dst}\"). Prefix with # to prepend a hash symbol (e.g. \"Buy Punk #{punkIndex}\" renders as \"Buy Punk #7804\"). Values are formatted using their type before insertion."
+          "description": "Template string rendered with formatted parameter values. Use {paramName} placeholders (e.g. \"Transfer {wad} to {dst}\"). Prefix with # to prepend a hash symbol (e.g. \"Buy Punk #{punkIndex}\" renders as \"Buy Punk #7804\"). {value} refers to the transaction value when the action declares a value object and no ABI parameter is named value. Values are formatted using their type before insertion."
         },
         "group": {
           "type": "string",
@@ -306,11 +313,11 @@
         },
         "featured": {
           "type": "boolean",
-          "description": "Mark as a primary/featured function. Featured functions are highlighted in the UI (e.g. the main mint, swap, or stake action)."
+          "description": "Mark as a primary/featured action. Featured actions are highlighted in the UI (e.g. the main mint, swap, or stake action)."
         },
         "hidden": {
           "type": "boolean",
-          "description": "Hide this function from the default UI. Use for internal or admin-only functions that clutter the interface."
+          "description": "Hide this action from the default UI. Use for internal or admin-only actions that clutter the interface. If every authored action referencing a function is hidden, the function itself is hidden."
         },
         "stateMutability": {
           "type": "string",
@@ -324,6 +331,10 @@
             "$ref": "#/$defs/ParamMeta"
           }
         },
+        "value": {
+          "$ref": "#/$defs/ValueMeta",
+          "description": "Metadata for the native currency (msg.value) sent with the call. Only meaningful on payable functions."
+        },
         "returns": {
           "type": "object",
           "description": "Return value metadata, keyed by ABI return name or _0, _1, etc.",
@@ -334,18 +345,18 @@
         "examples": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/FunctionExample"
+            "$ref": "#/$defs/ActionExample"
           },
           "description": "Preset examples for quick interaction."
         },
         "related": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "ABI names of related functions for navigation."
+          "description": "Action identifiers (keys in the top-level actions object) of related actions for navigation."
         },
         "deprecated": {
           "type": "string",
-          "description": "Deprecation notice. If set, the function should be de-emphasized in the UI."
+          "description": "Deprecation notice. If set, the action should be de-emphasized in the UI."
         }
       }
     },
@@ -474,7 +485,7 @@
         },
         "type": {
           "$ref": "#/$defs/Type",
-          "description": "Semantic type annotation. Tells consumers what a value represents (for display) and how it should be collected (for input)."
+          "description": "Semantic type annotation. Tells consumers what a value represents (for display) and how it should be collected (for input). Note: `type: \"hidden\"` is a display-side hint (don't render the value in read contexts) and is orthogonal to the input-side `hidden` flag below."
         },
         "autofill": {
           "$ref": "#/$defs/Autofill",
@@ -485,8 +496,52 @@
         },
         "preview": {
           "$ref": "#/$defs/ParamPreview"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "When true, do not render an input for this parameter. The `autofill` value is injected at call time. REQUIRES `autofill`. Use for variant actions like `revoke` where a parameter is fixed (e.g. amount = 0)."
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "When true, render the input but make it non-editable. Displays the autofilled value for transparency. REQUIRES `autofill`. Mutually exclusive with `hidden: true`."
         }
       }
+    },
+    "ValueMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^_[a-zA-Z]": {
+          "description": "Extension object. Names must start with _ followed by a letter. Consumers that do not understand a given extension must ignore it."
+        }
+      },
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for the attached native currency amount."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 120,
+          "description": "One short sentence on what the attached amount pays for."
+        },
+        "autofill": {
+          "$ref": "#/$defs/Autofill",
+          "description": "Pre-populate the value input. A constant is denominated in wei."
+        },
+        "validation": {
+          "$ref": "#/$defs/ValidationRule"
+        },
+        "hidden": {
+          "type": "boolean",
+          "description": "When true, do not render a value input. The `autofill` value is attached at call time. REQUIRES `autofill`."
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "When true, render the value input but make it non-editable (e.g. a fixed mint price). REQUIRES `autofill`. Mutually exclusive with `hidden: true`."
+        }
+      },
+      "description": "Metadata for the native currency (msg.value) sent with a payable call. Always denominated in wei and rendered as the eth semantic type."
     },
     "Type": {
       "oneOf": [
@@ -668,7 +723,7 @@
         }
       }
     },
-    "FunctionExample": {
+    "ActionExample": {
       "type": "object",
       "required": ["label", "params"],
       "additionalProperties": false,

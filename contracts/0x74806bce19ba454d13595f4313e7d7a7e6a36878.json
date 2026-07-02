@@ -12,7 +12,14 @@
   "description": "The one-of-one onchain artwork of the Hello World Computer: a WebGL particle field driven by its yes/no tallies.",
   "about": "## The computer's one-of-one artwork\n\nThis is the single, unique artwork tied to the Hello World Computer. There is exactly one — no editions, no copies. The piece is generated entirely onchain: calling `artpiece()` returns a complete HTML and WebGL2 document that renders a living particle field. The artwork reads the computer's current yes and no answer tallies and uses them to size its two particle states, so the image evolves as the computer learns.\n\n## Owning and trading it\n\nOwnership uses a minimal, self-contained marketplace in the spirit of CryptoPunks rather than a standard ERC-721. The current owner can list it for sale at a fixed ETH price — open to anyone, or reserved for one specific address — and can cancel a listing or hand the piece directly to someone with `transferOwnership`. A buyer takes it by calling `buyNow()` with exactly the asking price. The full sale price goes to the seller, who collects it with `withdraw()`.\n\n## Not a standard NFT\n\nBecause ownership is tracked by this contract's own logic, the artwork may not appear or move like a normal token in wallets and marketplaces that expect ERC-721. It exposes `name()` (\"Hello World Computer\") and `symbol()` (\"HWC\") for display, and `owner()` for the current holder.",
   "category": "nft",
-  "tags": ["art", "generative-art", "onchain", "one-of-one", "webgl", "marketplace"],
+  "tags": [
+    "art",
+    "generative-art",
+    "onchain",
+    "one-of-one",
+    "webgl",
+    "marketplace"
+  ],
   "links": [
     {
       "label": "Etherscan",
@@ -41,12 +48,24 @@
     "accent": "#484848"
   },
   "groups": {
-    "market": { "label": "Marketplace", "order": 1 },
-    "ownership": { "label": "Ownership", "order": 2 },
-    "artwork": { "label": "Artwork", "order": 3 },
-    "payments": { "label": "Payments", "order": 4 }
+    "market": {
+      "label": "Marketplace",
+      "order": 1
+    },
+    "ownership": {
+      "label": "Ownership",
+      "order": 2
+    },
+    "artwork": {
+      "label": "Artwork",
+      "order": 3
+    },
+    "payments": {
+      "label": "Payments",
+      "order": 4
+    }
   },
-  "functions": {
+  "actions": {
     "buyNow": {
       "title": "Buy Now",
       "description": "Buy the artwork at its current asking price by sending exactly the listed ETH, which is credited to the seller.",
@@ -54,7 +73,10 @@
       "order": 1,
       "featured": true,
       "warning": "Send exactly the asking price (see Current Offer). If the listing is reserved for a specific address, only that address can buy.",
-      "related": ["currentOffer", "listForSale"]
+      "related": [
+        "currentOffer",
+        "listForSale"
+      ]
     },
     "listForSale": {
       "title": "List for Sale",
@@ -64,7 +86,10 @@
       "order": 2,
       "warning": "Owner only. The price must be greater than zero. Listing replaces any existing offer.",
       "params": {
-        "salePriceInWei": { "label": "Price", "type": "eth" },
+        "salePriceInWei": {
+          "label": "Price",
+          "type": "eth"
+        },
         "toAddress": {
           "label": "Reserved buyer",
           "description": "Restrict the sale to this address, or use the zero address to sell to anyone.",
@@ -72,7 +97,11 @@
           "autofill": "zero-address"
         }
       },
-      "related": ["buyNow", "cancelFromSale", "currentOffer"]
+      "related": [
+        "buyNow",
+        "cancelFromSale",
+        "currentOffer"
+      ]
     },
     "cancelFromSale": {
       "title": "Cancel Listing",
@@ -80,7 +109,10 @@
       "group": "market",
       "order": 3,
       "warning": "Owner only.",
-      "related": ["listForSale", "currentOffer"]
+      "related": [
+        "listForSale",
+        "currentOffer"
+      ]
     },
     "currentOffer": {
       "title": "Current Offer",
@@ -89,11 +121,23 @@
       "group": "market",
       "order": 4,
       "returns": {
-        "active": { "label": "For sale", "type": "boolean" },
-        "value": { "label": "Price", "type": "eth" },
-        "toAddress": { "label": "Reserved buyer", "type": "address" }
+        "active": {
+          "label": "For sale",
+          "type": "boolean"
+        },
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
       },
-      "related": ["buyNow", "listForSale"]
+      "related": [
+        "buyNow",
+        "listForSale"
+      ]
     },
     "owner": {
       "title": "Owner",
@@ -102,9 +146,14 @@
       "group": "ownership",
       "order": 1,
       "returns": {
-        "_0": { "label": "Owner", "type": "address" }
+        "_0": {
+          "label": "Owner",
+          "type": "address"
+        }
       },
-      "related": ["transferOwnership"]
+      "related": [
+        "transferOwnership"
+      ]
     },
     "transferOwnership": {
       "title": "Transfer Ownership",
@@ -114,9 +163,14 @@
       "order": 2,
       "warning": "Owner only. This is a gift — no ETH changes hands — and it cancels any active listing.",
       "params": {
-        "newOwner": { "label": "New owner", "type": "address" }
+        "newOwner": {
+          "label": "New owner",
+          "type": "address"
+        }
       },
-      "related": ["owner"]
+      "related": [
+        "owner"
+      ]
     },
     "artpiece": {
       "title": "Artwork",
@@ -125,9 +179,13 @@
       "group": "artwork",
       "order": 1,
       "returns": {
-        "_0": { "label": "HTML document" }
+        "_0": {
+          "label": "HTML document"
+        }
       },
-      "related": ["computer"]
+      "related": [
+        "computer"
+      ]
     },
     "computer": {
       "title": "Computer",
@@ -136,9 +194,14 @@
       "group": "artwork",
       "order": 2,
       "returns": {
-        "_0": { "label": "Computer", "type": "address" }
+        "_0": {
+          "label": "Computer",
+          "type": "address"
+        }
       },
-      "related": ["artpiece"]
+      "related": [
+        "artpiece"
+      ]
     },
     "name": {
       "title": "Name",
@@ -161,19 +224,29 @@
       "group": "payments",
       "order": 1,
       "params": {
-        "account": { "label": "Account", "type": "address" }
+        "account": {
+          "label": "Account",
+          "type": "address"
+        }
       },
       "returns": {
-        "_0": { "label": "Pending", "type": "eth" }
+        "_0": {
+          "label": "Pending",
+          "type": "eth"
+        }
       },
-      "related": ["withdraw"]
+      "related": [
+        "withdraw"
+      ]
     },
     "withdraw": {
       "title": "Withdraw",
       "description": "Collect the sale proceeds owed to you from a completed sale.",
       "group": "payments",
       "order": 2,
-      "related": ["pendingWithdrawals"]
+      "related": [
+        "pendingWithdrawals"
+      ]
     }
   },
   "events": {
@@ -181,42 +254,78 @@
       "title": "Artwork Created",
       "description": "Emitted once when the artwork is created and its first owner is set.",
       "params": {
-        "creator": { "label": "First owner", "type": "address" }
+        "creator": {
+          "label": "First owner",
+          "type": "address"
+        }
       }
     },
     "ArtifactTransferred": {
       "title": "Ownership Transferred",
       "description": "Emitted when the artwork changes hands, whether by sale or direct transfer.",
       "params": {
-        "oldOwner": { "label": "From", "type": "address" },
-        "newOwner": { "label": "To", "type": "address" }
+        "oldOwner": {
+          "label": "From",
+          "type": "address"
+        },
+        "newOwner": {
+          "label": "To",
+          "type": "address"
+        }
       }
     },
     "ListedForSale": {
       "title": "Listed for Sale",
       "description": "Emitted when the artwork is put up for sale.",
       "params": {
-        "value": { "label": "Price", "type": "eth" },
-        "fromAddress": { "label": "Seller", "type": "address" },
-        "toAddress": { "label": "Reserved buyer", "type": "address" }
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "fromAddress": {
+          "label": "Seller",
+          "type": "address"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
       }
     },
     "Unlist": {
       "title": "Listing Cancelled",
       "description": "Emitted when an active listing is removed.",
       "params": {
-        "value": { "label": "Price", "type": "eth" },
-        "fromAddress": { "label": "Seller", "type": "address" },
-        "toAddress": { "label": "Reserved buyer", "type": "address" }
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "fromAddress": {
+          "label": "Seller",
+          "type": "address"
+        },
+        "toAddress": {
+          "label": "Reserved buyer",
+          "type": "address"
+        }
       }
     },
     "Sale": {
       "title": "Sold",
       "description": "Emitted when the artwork is sold.",
       "params": {
-        "value": { "label": "Price", "type": "eth" },
-        "fromAddress": { "label": "Seller", "type": "address" },
-        "toAddress": { "label": "Buyer", "type": "address" }
+        "value": {
+          "label": "Price",
+          "type": "eth"
+        },
+        "fromAddress": {
+          "label": "Seller",
+          "type": "address"
+        },
+        "toAddress": {
+          "label": "Buyer",
+          "type": "address"
+        }
       }
     }
   },
