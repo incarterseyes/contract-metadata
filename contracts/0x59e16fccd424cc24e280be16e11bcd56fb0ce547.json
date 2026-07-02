@@ -8,7 +8,7 @@
     "locale": "en"
   },
   "name": "ENS ETH Registrar Controller",
-  "description": "The user-facing controller for .eth name registrations on ENS. Implements a commit-reveal scheme to prevent front-running, enforces minimum registration duration (28 days), and collects ETH payment based on name length and duration. Names are priced in USD and converted to ETH via Chainlink. Recently expired names carry a temporary premium that decays exponentially over ~21 days.",
+  "description": "The user-facing controller for registering and renewing .eth names, using commit-reveal to prevent front-running.",
   "about": "## Two-step registration (commit-reveal)\n\nRegistering a .eth name requires two transactions to prevent front-running. First, the user submits a hidden commitment — a hash of the desired name, owner, duration, and a random secret. After waiting at least 60 seconds (but no more than 24 hours), the user reveals the registration details and pays the fee. This prevents miners or bots from seeing a pending registration and stealing the name by submitting their own transaction first.\n\n## Pricing by name length\n\nNames are priced annually in USD, converted to ETH at the current exchange rate via Chainlink. Shorter names cost more: 5+ character names cost approximately $5/year, 4-character names ~$160/year, and 3-character names ~$640/year. Names must be at least 3 characters. The minimum registration duration is 28 days.\n\n## Expired name premiums\n\nWhen a name expires, the owner has a 90-day grace period to renew. After the grace period, the name becomes available but carries a temporary premium that starts extremely high and decays exponentially — halving roughly every day. After about 21 days the premium becomes negligible. This Dutch auction mechanism ensures fair price discovery for desirable expired names and prevents sniping at the moment of expiry.\n\n## The ENS architecture\n\nENS separates concerns across multiple contracts. The ENS Registry maps names to owners and resolvers. The Base Registrar is the ERC-721 NFT contract that tracks .eth name ownership and expiry. This Controller is the user-facing entry point that orchestrates registration: it handles pricing, commit-reveal, and can atomically set a resolver and records (addresses, text records, content hashes) during registration. Resolvers are separate contracts that store the actual records a name points to.",
   "risks": [
     "Names expire — if not renewed, names become available for re-registration after a 90-day grace period",
@@ -36,7 +36,7 @@
   "functions": {
     "available": {
       "title": "Check Availability",
-      "description": "Check whether a .eth name is available for registration. Returns false if the name is currently registered or in its 90-day grace period.",
+      "description": "Check whether a .eth name is available to register; false if it is registered or in its 90-day grace period.",
       "stateMutability": "view",
       "group": "info",
       "params": {
@@ -52,7 +52,7 @@
     },
     "rentPrice": {
       "title": "Price",
-      "description": "Get the registration or renewal price for a name. Returns the base price and any temporary premium (for recently expired names). Prices are in wei, converted from USD via Chainlink.",
+      "description": "Get the registration or renewal price for a name: a base price plus any premium for recently expired names.",
       "stateMutability": "view",
       "group": "info",
       "params": {
@@ -85,7 +85,7 @@
     },
     "makeCommitment": {
       "title": "Make Commitment",
-      "description": "Generate a commitment hash for the first step of registration. Call this off-chain, then submit the hash via commit(). The commitment hides the name being registered to prevent front-running.",
+      "description": "Generate the commitment hash for the first step of registration, computed off-chain and then submitted via commit().",
       "stateMutability": "pure",
       "group": "registration",
       "params": {
@@ -98,7 +98,7 @@
     },
     "commit": {
       "title": "Commit",
-      "description": "Submit a commitment hash — the first step of the two-step registration process. After committing, wait at least 60 seconds before calling register(). The commitment expires after 24 hours.",
+      "description": "Submit a commitment hash — the first step of registration — then wait before calling register().",
       "group": "registration",
       "params": {
         "commitment": {
@@ -110,21 +110,21 @@
     },
     "register": {
       "title": "Register",
-      "description": "Complete a name registration — the second step after commit(). Submit the same registration details used to generate the commitment, along with ETH payment. The contract verifies the commitment, registers the name, optionally sets resolver and records, and refunds excess ETH.",
+      "description": "Complete a registration — the second step after commit() — by submitting the original details plus ETH payment.",
       "intent": "Register a .eth name",
       "group": "registration",
       "warning": "Sends ETH. Ensure you committed at least 60 seconds ago and that the commitment has not expired (24 hour window).",
       "params": {
         "registration": {
           "label": "registration",
-          "description": "The same Registration struct used in makeCommitment(): label, owner, duration, secret, resolver, data, reverseRecord, referrer"
+          "description": "The same Registration struct passed to makeCommitment(): label, owner, duration, secret, resolver, data, etc."
         }
       },
       "related": ["commit", "makeCommitment", "rentPrice", "available"]
     },
     "renew": {
       "title": "Renew",
-      "description": "Extend the registration of a .eth name. Anyone can renew any name — you don't have to be the owner. Only the base price is charged (no premium). Excess ETH is refunded.",
+      "description": "Extend a .eth name's registration; anyone can renew any name at the base price, with excess ETH refunded.",
       "intent": "Renew {label}.eth for {duration}",
       "group": "renewal",
       "warning": "Sends ETH to cover the renewal cost.",
@@ -147,7 +147,7 @@
     },
     "commitments": {
       "title": "Commitment Timestamp",
-      "description": "Check when a commitment was submitted. Returns the block timestamp of the commit transaction, or 0 if the commitment doesn't exist.",
+      "description": "Check when a commitment was submitted, returning its commit block timestamp, or 0 if it doesn't exist.",
       "stateMutability": "view",
       "group": "registration",
       "params": {
@@ -168,7 +168,7 @@
     },
     "maxCommitmentAge": {
       "title": "Max Commitment Age",
-      "description": "Maximum time (in seconds) a commitment remains valid. After this, the commitment expires and a new one must be made. Typically 24 hours.",
+      "description": "Maximum time in seconds a commitment stays valid before it expires and a new one is needed (typically 24 hours).",
       "stateMutability": "view",
       "group": "info",
       "returns": { "_0": { "type": "duration" } }

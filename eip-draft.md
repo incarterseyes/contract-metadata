@@ -89,6 +89,12 @@ The following fields provide context about the contract itself. The fields `name
 | `errors`    | `object` | OPTIONAL | Per-error metadata, keyed by name, signature, or 4-byte selector         |
 | `messages`  | `object` | OPTIONAL | EIP-712 typed message metadata, keyed by primary type name               |
 
+### Description Length
+
+Every `description` field -- whether on the contract, a function, event, error, message, group, or parameter -- SHOULD be a single, plain-language sentence and MUST NOT exceed **120 characters**. Descriptions are rendered in space-constrained UI such as tooltips, list rows, and transaction previews, so they must stay short and scannable.
+
+Long-form context -- history, multi-paragraph explanations, and Markdown formatting -- belongs in the contract-level `about` field, which has no length limit. Do not pack paragraphs into `description`.
+
 ### Contract-Level Example
 
 ```json
@@ -175,7 +181,7 @@ Each function entry MAY include the following fields:
 
 - `order` (integer): Display order within the function's group. Lower numbers appear first. Functions without an `order` are sorted after ordered ones.
 - `title` (string): Human-readable title for the function.
-- `description` (string): Longer explanation of what the function does.
+- `description` (string): A single short sentence explaining what the function does (max 120 characters -- see [Description Length](#description-length)).
 - `group` (string): Key referencing a named group in the `groups` object.
 - `warning` (string): Cautionary text displayed to the user.
 - `featured` (boolean): If `true`, highlights this as a primary action.
