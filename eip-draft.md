@@ -102,6 +102,12 @@ The common `chainId` and `address` pair describe a single deployed contract. For
 
 Consumers that understand only `chainId` and `address` MUST be able to ignore the richer deployment context without losing the basic contract identity.
 
+### Description Length
+
+Every `description` field -- whether on the contract, a function, event, error, message, group, or parameter -- SHOULD be a single, plain-language sentence and MUST NOT exceed **120 characters**. Descriptions are rendered in space-constrained UI such as tooltips, list rows, and transaction previews, so they must stay short and scannable.
+
+Long-form context -- history, multi-paragraph explanations, and Markdown formatting -- belongs in the contract-level `about` field, which has no length limit. Do not pack paragraphs into `description`.
+
 ### Contract-Level Example
 
 ```json
@@ -202,7 +208,7 @@ Each function entry MAY include the following fields:
 
 - `order` (integer): Display order within the function's group. Lower numbers appear first. Functions without an `order` are sorted after ordered ones.
 - `title` (string): Human-readable title for the function.
-- `description` (string): Longer explanation of what the function does.
+- `description` (string): A single short sentence explaining what the function does (max 120 characters -- see [Description Length](#description-length)).
 - `group` (string): Key referencing a named group in the `groups` object.
 - `warning` (string): Cautionary text displayed to the user.
 - `featured` (boolean): If `true`, highlights this as a primary action.
@@ -274,6 +280,9 @@ Formats that need additional configuration use field-level `params`:
 // Token amount for a specific token
 { "path": "amount", "format": "tokenAmount", "params": { "token": "0x..." } }
 
+// Generic fixed-point amount (oracle price, share price, accounting unit)
+{ "type": "amount", "decimals": 8, "symbol": "USD" }
+
 // Token ID for a specific NFT collection
 { "path": "tokenId", "format": "nftName", "params": { "collection": "0x..." } }
 
@@ -283,6 +292,20 @@ Formats that need additional configuration use field-level `params`:
 // Date encoded as a unix timestamp
 { "path": "deadline", "format": "date", "params": { "encoding": "timestamp" } }
 ```
+
+#### Amount-like Formats
+
+`amount`, `tokenAmount`, and `unit` share one formatting contract -- **display value = raw integer / 10^decimals**, rendered with a symbol. They differ only in where `decimals` and the symbol come from:
+
+| Format        | decimals                     | symbol                          | asset                   |
+| ------------- | ---------------------------- | ------------------------------- | ----------------------- |
+| `amount`      | 18 (fixed)                   | chain's native ticker (fixed)   | native                  |
+| `tokenAmount` | on-chain `decimals()`        | on-chain `symbol()`             | token at `token` param  |
+| `unit`        | `decimals` param (default 0) | `base` param                    | none                    |
+
+Use `amount` or `tokenAmount` when the asset has an identity; use `unit` only for fixed-point numbers with no asset -- oracle outputs, share prices, internal accounting units.
+
+#### Formatter Params
 
 Common formatter params SHOULD be understood as part of the display format contract:
 

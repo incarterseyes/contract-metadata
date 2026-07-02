@@ -8,7 +8,7 @@
     "locale": "en"
   },
   "name": "CryptoPunks",
-  "description": "One of the earliest NFT projects, predating the ERC-721 standard. Each punk is a 24×24 pixel art image with randomly generated attributes including hairstyle, accessories, and skin tone.",
+  "description": "One of the earliest NFT projects, predating ERC-721 — 10,000 24×24 pixel-art punks with randomly generated attributes.",
   "about": "## 10,000 unique collectible characters\n\nHumans have always been collectors, gathering tangible items like gemstones and watches, intangible things like books and art, and abstract concepts like knowledge. CryptoPunks extend this collecting impulse into the digital realm. The project consists of ten thousand 24×24 pixel portraits of punks, each assembled from various individual traits such as hairstyles and jewelry.\n\n## Proof of Ownership on the Ethereum Blockchain\n\nThe blockchain establishes a shared historical log and single source of truth about what happened when. This enables tracking ownership of objects over time. When CryptoPunks launched, they came with code processing ownership changes for each punk. All changes must go through this immutable, unblockable program. Anyone can prove punk ownership at any moment.\n\nThe Ethereum blockchain is validated by hundreds of thousands of distributed computers globally. Anyone can participate in securing the network. No entity can change any part of its state without following blockchain rules and smart contracts. For CryptoPunks, the relevant code is called the \"CryptoPunksMarket\" smart contract.\n\n## Inspired the modern CryptoArt movement\n\nThe world's biggest artists, auction houses and brands agree we live in a digitized world. This is a new medium, like past art forms, and cryptography and blockchain technologies enable collecting, owning, and trading items on a global, borderless market.\n\nCryptoPunks were the seminal art project of its kind, inspiring various technological standards and spearheading an entire movement. The Punks are now exhibited in prestigious museums like Centre Pompidou and LACMA, celebrated by icons from fashion, music, art and technology.\n\nThe CryptoPunksMarket smart contract has processed billions in trading volume. Thousands of accounts have interacted with it, over 6000 have owned punks, and the most traded punk has changed hands 51 times — all handled by code under 200 lines long.\n\n2.5+ billion dollars in secure trading. 200 lines of code. A global community with no middlemen or rent seekers.",
   "risks": [
     "No upgradeability — contract bugs are permanent and cannot be patched",
@@ -94,7 +94,7 @@
           "contentLabel": "Canonical image file",
           "contentType": "image",
           "title": "The 10,000 CryptoPunks",
-          "description": "The CryptoPunks contract stores a SHA-256 hash of the canonical composite image containing all 10,000 punks. This panel fetches the original image, hashes it in your browser, and checks whether the result matches the onchain value.",
+          "description": "Fetches the canonical CryptoPunks composite image, hashes it in your browser, and compares it to the onchain hash.",
           "explainer": "If the computed hash matches the onchain hash, the image file is byte-for-byte identical to the one the creators committed when deploying the contract. Any modification — even a single pixel — would produce a completely different hash.",
           "links": [
             {
@@ -534,7 +534,7 @@
     "acceptBidForPunk": {
       "order": 7,
       "title": "Accept Bid",
-      "description": "Accept the highest bid on a punk you own. The punk is transferred to the bidder and the bid amount is credited to your pending withdrawals.",
+      "description": "Accept the highest bid on a punk you own; the punk goes to the bidder and the ETH to your pending withdrawals.",
       "group": "marketplace",
       "params": {
         "punkIndex": {
@@ -648,7 +648,7 @@
     "getPunk": {
       "order": 0,
       "title": "Claim Punk (Inactive)",
-      "description": "Originally used to claim a free punk during the initial distribution. All 10,000 punks have been claimed — this function is no longer usable.",
+      "description": "Originally used to claim a free punk at launch; all 10,000 are claimed, so this function is no longer usable.",
       "deprecated": "All 10,000 punks have been claimed. This function will revert.",
       "group": "genesis",
       "params": {

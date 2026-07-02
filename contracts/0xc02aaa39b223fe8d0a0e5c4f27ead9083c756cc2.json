@@ -11,7 +11,7 @@
     "locale": "en"
   },
   "name": "Wrapped Ether",
-  "description": "The canonical WETH contract used across DeFi. Allows native ETH to be used wherever ERC-20 tokens are required. 1 WETH is always redeemable for exactly 1 ETH.",
+  "description": "The canonical WETH contract, wrapping native ETH 1:1 as an ERC-20 token used across DeFi.",
   "risks": [
     "No upgradeability — critical DeFi infrastructure with no ability to patch",
     "Wrapping locks ETH in the contract — any exploit could affect all deposited ETH",

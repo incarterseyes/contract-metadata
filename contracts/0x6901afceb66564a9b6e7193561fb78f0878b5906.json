@@ -1,0 +1,319 @@
+{
+  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "chainId": 1,
+  "address": "0x6901afceb66564a9b6e7193561fb78f0878b5906",
+  "meta": {
+    "version": 1,
+    "lastUpdated": "2026-06-20T00:00:00Z",
+    "locale": "en"
+  },
+  "name": "Hello World Computer",
+  "symbol": "HWC",
+  "description": "An onchain neural network that learns from yes/no questions, training one shared perceptron from paid answers.",
+  "about": "## A mind built from yes and no\n\nThe Hello World Computer is an onchain neural network — a single shared perceptron that starts knowing nothing. Everything it comes to lean toward, someone taught it through yes-or-no questions.\n\n## Asking and answering\n\nAnyone can ask a question for a flat 0.01 ETH fee. Each question is deployed as its own *Binary* contract and joins a queue. People answer questions yes or no by attaching ETH — the more ETH, the more weight the answer carries (minimum 0.0001 ETH per answer). While a question waits in line, every answer it receives raises its standing.\n\n## The lifecycle\n\nRoughly every 10 minutes the highest-activity question in the queue is promoted into the live set. Up to 150 questions can be live at once and the queue holds up to 2,048. A live question stays active for about 25 hours. Anyone can call `push()` to move the machine forward: it settles the oldest live question that has finished its run, then promotes the next one. Whoever triggers a promotion earns a small 0.0001 ETH bounty.\n\n## Learning and payouts\n\nWhen a question settles, its accumulated answer fees are split 90% to the question's creator and 10% to the protocol, and the question teaches the shared perceptron exactly once — nudging the computer's 1,024 feature weights toward the net yes/no lean it received. You can read the whole mind at any time with `featureStates()`, or ask it what it makes of a new message with `ask()`.\n\n## Payments are pull-based\n\nCreator cuts, promotion bounties, and protocol cuts accumulate as pending balances. Call `withdraw()` to collect what the computer owes you. The contract has no owner controls, no upgrade path, and no pause — the rules are fixed at deployment.",
+  "category": "ai",
+  "tags": ["neural-network", "perceptron", "onchain-ai", "machine-learning", "generative-art", "experimental"],
+  "links": [
+    {
+      "label": "Etherscan",
+      "url": "https://etherscan.io/address/0x6901afceb66564a9b6E7193561fB78F0878b5906"
+    },
+    {
+      "label": "Artwork",
+      "url": "https://etherscan.io/address/0x74806BCe19BA454d13595F4313E7d7A7E6a36878"
+    },
+    {
+      "label": "ENS",
+      "url": "https://app.ens.domains/helloworldcomputer.eth"
+    }
+  ],
+  "risks": [
+    "Asking a question costs exactly 0.01 ETH — sending any other amount reverts.",
+    "A new question is not immediately live. It sits in a queue and is promoted roughly every 10 minutes, highest-activity first. The queue holds at most 2,048 questions and reverts when full.",
+    "A live question only settles (paying out fees and teaching the mind) after its ~25-hour active lifetime, once someone calls push().",
+    "Answer fees are split 90% to the question's creator and 10% to the protocol at settlement.",
+    "Payouts are pull-based: creator cuts, promotion bounties, and protocol cuts accumulate as pending balances you must withdraw yourself.",
+    "The contract accepts plain ETH transfers only from its own question contracts; direct sends from any other address revert.",
+    "No admin keys, no upgradeability, no pause — the rules are fixed at deployment."
+  ],
+  "theme": {
+    "background": "#ffffff",
+    "text": "#111111",
+    "accent": "#484848"
+  },
+  "groups": {
+    "interact": { "label": "Interact", "order": 1 },
+    "mind": { "label": "The Mind", "order": 2 },
+    "stats": { "label": "Stats", "order": 3 },
+    "payments": { "label": "Payments", "order": 4 },
+    "artwork": { "label": "Artwork", "order": 5 }
+  },
+  "functions": {
+    "deployBinary": {
+      "title": "Ask a Question",
+      "description": "Ask the computer a question for a flat 0.01 ETH fee, deploying it as its own Binary contract that joins the queue.",
+      "intent": "Ask a question",
+      "interpolatedIntent": "Ask: {question}",
+      "group": "interact",
+      "order": 1,
+      "featured": true,
+      "warning": "Costs exactly 0.01 ETH — any other amount reverts. The question enters a queue and only goes live once promoted (roughly every 10 minutes, highest-activity first).",
+      "params": {
+        "question": {
+          "label": "Question",
+          "description": "The yes/no question to ask. Its words are reduced to features the computer can learn from."
+        }
+      },
+      "returns": {
+        "id": { "label": "Question ID" },
+        "binaryAddr": { "label": "Question contract", "type": "address" }
+      },
+      "related": ["batchAnswer", "push", "ask"]
+    },
+    "batchAnswer": {
+      "title": "Answer Questions",
+      "description": "Answer one or more questions yes or no in a single transaction, sending ETH equal to the sum of each answer's weight.",
+      "group": "interact",
+      "order": 2,
+      "featured": true,
+      "warning": "The ETH you send must exactly equal the sum of all answer weights, and every target must be a question deployed by this computer, or the whole batch reverts.",
+      "params": {
+        "answers": {
+          "label": "Answers",
+          "description": "A list of answers, each a (question address, yes/no, ETH weight) triple. Minimum 0.0001 ETH per answer."
+        }
+      },
+      "related": ["deployBinary", "push"]
+    },
+    "push": {
+      "title": "Advance the Computer",
+      "description": "Advance the computer one step: settle the oldest expired live question and promote the top queued one when due.",
+      "group": "interact",
+      "order": 3,
+      "warning": "Whoever triggers a promotion earns a 0.0001 ETH bounty. If nothing is due to settle or promote, the call simply does nothing.",
+      "related": ["deployBinary", "batchAnswer"]
+    },
+    "ask": {
+      "title": "Read the Mind",
+      "description": "Run a message through the trained perceptron to see which way it leans and its confidence — a read-only query.",
+      "intent": "Ask the computer",
+      "interpolatedIntent": "What do you make of: {message}",
+      "stateMutability": "view",
+      "group": "mind",
+      "order": 1,
+      "featured": true,
+      "params": {
+        "message": {
+          "label": "Message",
+          "description": "Any text to classify against what the computer has learned."
+        }
+      },
+      "returns": {
+        "label": {
+          "label": "Lean",
+          "type": {
+            "type": "enum",
+            "values": {
+              "0": "Leans yes",
+              "1": "Leans no"
+            }
+          }
+        },
+        "confidence": {
+          "label": "Confidence margin",
+          "description": "How strongly the computer leans, as a signed margin. Larger magnitude means a stronger conviction."
+        }
+      },
+      "related": ["featureStates", "totalResponses"]
+    },
+    "featureStates": {
+      "title": "Feature Weights",
+      "description": "The computer's full mind: 1,024 signed perceptron weights in feature order, raw as stored, readable in a single call.",
+      "stateMutability": "view",
+      "group": "mind",
+      "order": 2,
+      "returns": {
+        "_0": { "label": "Weights" }
+      },
+      "related": ["ask", "totalResponses"]
+    },
+    "totalBinaries": {
+      "title": "Total Questions",
+      "description": "How many questions have ever been asked.",
+      "stateMutability": "view",
+      "group": "stats",
+      "order": 1
+    },
+    "totalResponses": {
+      "title": "Lessons Learned",
+      "description": "How many times the computer has learned something — one lesson per settled question that carried a non-zero lean.",
+      "stateMutability": "view",
+      "group": "stats",
+      "order": 2
+    },
+    "totalAnswers": {
+      "title": "Total Votes",
+      "description": "The total yes and no answer weight cast across every question.",
+      "stateMutability": "view",
+      "group": "stats",
+      "order": 3,
+      "returns": {
+        "positive": { "label": "Yes weight" },
+        "negative": { "label": "No weight" }
+      }
+    },
+    "pendingWithdrawals": {
+      "title": "Pending Balance",
+      "description": "How much ETH the computer is holding for an address — creator cuts, bounties, or protocol cuts — awaiting withdrawal.",
+      "stateMutability": "view",
+      "group": "payments",
+      "order": 1,
+      "params": {
+        "account": { "label": "Account", "type": "address" }
+      },
+      "returns": {
+        "_0": { "label": "Pending", "type": "eth" }
+      },
+      "related": ["withdraw"]
+    },
+    "withdraw": {
+      "title": "Withdraw",
+      "description": "Collect everything the computer owes you: creator cuts, promotion bounties, and any protocol cuts.",
+      "group": "payments",
+      "order": 2,
+      "related": ["pendingWithdrawals"]
+    },
+    "artifact": {
+      "title": "Artwork Address",
+      "description": "The address of the computer's one-of-one artwork contract.",
+      "stateMutability": "view",
+      "group": "artwork",
+      "order": 1,
+      "returns": {
+        "_0": { "label": "Artwork", "type": "address" }
+      },
+      "related": ["owner", "currentOffer"]
+    },
+    "owner": {
+      "title": "Artwork Owner",
+      "description": "The current owner of the computer's one-of-one artwork, who also receives the 10% protocol cut.",
+      "stateMutability": "view",
+      "group": "artwork",
+      "order": 2,
+      "returns": {
+        "_0": { "label": "Owner", "type": "address" }
+      },
+      "related": ["artifact", "currentOffer"]
+    },
+    "currentOffer": {
+      "title": "Artwork Offer",
+      "description": "The artwork's current sale offer, if any. Delegates to the artwork contract.",
+      "stateMutability": "view",
+      "group": "artwork",
+      "order": 3,
+      "returns": {
+        "active": { "label": "For sale", "type": "boolean" },
+        "value": { "label": "Price", "type": "eth" },
+        "toAddress": { "label": "Reserved buyer", "type": "address" }
+      },
+      "related": ["artifact", "owner"]
+    },
+    "onAnswer": {
+      "title": "On Answer (internal)",
+      "description": "Internal hook, callable only by the computer's own questions, that records an answer against a queued or live question.",
+      "hidden": true,
+      "params": {
+        "activityDelta": { "label": "Weight" },
+        "yes": { "label": "Yes", "type": "boolean" }
+      }
+    }
+  },
+  "events": {
+    "BinaryDeployed": {
+      "title": "Question Asked",
+      "description": "Emitted when a new question is asked and enters the queue.",
+      "params": {
+        "id": { "label": "Question ID" },
+        "binary": { "label": "Question contract", "type": "address" },
+        "creator": { "label": "Asked by", "type": "address" },
+        "question": { "label": "Question" }
+      }
+    },
+    "BinaryActivated": {
+      "title": "Question Went Live",
+      "description": "Emitted when a queued question is promoted into the live set.",
+      "params": {
+        "id": { "label": "Question ID" },
+        "binary": { "label": "Question contract", "type": "address" }
+      }
+    },
+    "BinarySettled": {
+      "title": "Question Settled",
+      "description": "Emitted when a live question finishes its run: its fees are split 90/10 and its lean is taught to the mind.",
+      "params": {
+        "id": { "label": "Question ID" },
+        "binary": { "label": "Question contract", "type": "address" },
+        "creatorCut": { "label": "Creator cut", "type": "eth" },
+        "protocolCut": { "label": "Protocol cut", "type": "eth" },
+        "weight": { "label": "Learned lean", "description": "The question's net yes/no lean taught to the perceptron (signed)." }
+      }
+    },
+    "Taught": {
+      "title": "Computer Taught",
+      "description": "Emitted when a settled question teaches the shared perceptron a lesson.",
+      "params": {
+        "messageHash": { "label": "Question hash" },
+        "message": { "label": "Question" },
+        "label": {
+          "label": "Lean",
+          "type": {
+            "type": "enum",
+            "values": {
+              "0": "Yes",
+              "1": "No"
+            }
+          }
+        },
+        "teacher": { "label": "Taught by", "type": "address" },
+        "weight": { "label": "Lesson weight" }
+      }
+    },
+    "ArtifactDeployed": {
+      "title": "Artwork Deployed",
+      "description": "Emitted once at construction, when the companion one-of-one artwork is deployed.",
+      "params": {
+        "artifact": { "label": "Artwork", "type": "address" }
+      }
+    }
+  },
+  "errors": {
+    "IncorrectDeployFee": {
+      "title": "Incorrect Fee",
+      "description": "Asking a question requires sending exactly 0.01 ETH."
+    },
+    "OnlyBinary": {
+      "title": "Only a Question",
+      "description": "This action may only be performed by one of the computer's own question contracts."
+    },
+    "QueueFull": {
+      "title": "Queue Full",
+      "description": "The queue is at its maximum of 2,048 waiting questions. Try again after some have been promoted."
+    },
+    "NotAnswerable": {
+      "title": "Not Answerable",
+      "description": "The question is no longer accepting answers — only queued or live questions can be answered."
+    },
+    "AnswerValueMismatch": {
+      "title": "Value Mismatch",
+      "description": "The ETH sent does not equal the sum of the answer weights in the batch."
+    },
+    "InsufficientFunds": {
+      "title": "Nothing to Withdraw",
+      "description": "There is no pending balance to withdraw for your address."
+    },
+    "FundsTransfer": {
+      "title": "Transfer Failed",
+      "description": "An ETH transfer failed. Ensure your address can receive ETH."
+    }
+  }
+}
