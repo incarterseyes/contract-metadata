@@ -326,7 +326,7 @@
         },
         "params": {
           "type": "object",
-          "description": "Parameter metadata, keyed by ABI parameter name. Use _0, _1, etc. for unnamed parameters.",
+          "description": "Parameter metadata, keyed by ABI parameter name or zero-based position (_0, _1, ...). Positional keys resolve regardless of the ABI name; interface files must use them. When both forms describe the same parameter, the name key wins.",
           "additionalProperties": {
             "$ref": "#/$defs/ParamMeta"
           }
@@ -337,7 +337,7 @@
         },
         "returns": {
           "type": "object",
-          "description": "Return value metadata, keyed by ABI return name or _0, _1, etc.",
+          "description": "Return value metadata, keyed by ABI return name or zero-based position (_0, _1, ...).",
           "additionalProperties": {
             "$ref": "#/$defs/ParamMeta"
           }
@@ -426,7 +426,7 @@
         },
         "params": {
           "type": "object",
-          "description": "Parameter metadata, keyed by ABI parameter name.",
+          "description": "Parameter metadata, keyed by ABI parameter name or zero-based position (_0, _1, ...).",
           "additionalProperties": {
             "$ref": "#/$defs/ParamMeta"
           }
@@ -458,7 +458,7 @@
         },
         "params": {
           "type": "object",
-          "description": "Parameter metadata, keyed by ABI parameter name.",
+          "description": "Parameter metadata, keyed by ABI parameter name or zero-based position (_0, _1, ...).",
           "additionalProperties": {
             "$ref": "#/$defs/ParamMeta"
           }
@@ -735,7 +735,7 @@
         "params": {
           "type": "object",
           "additionalProperties": { "type": "string" },
-          "description": "Parameter values for the example, keyed by parameter name."
+          "description": "Parameter values for the example, keyed by ABI parameter name or zero-based position (_0, _1, ...)."
         }
       }
     }

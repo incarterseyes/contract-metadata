@@ -40,13 +40,13 @@
     "withdraw": {
       "title": "Unwrap WETH",
       "description": "Unwrap WETH back to native ETH. Burns WETH and sends you ETH.",
-      "intent": "Unwrap {wad} WETH back to ETH",
+      "intent": "Unwrap {wad} back to ETH",
       "group": "wrap",
       "params": {
         "wad": {
           "label": "amount",
-          "description": "Amount of WETH to unwrap (in wei)",
-          "type": "eth"
+          "description": "Amount of WETH to unwrap. You receive the same amount in ETH.",
+          "type": "token-amount"
         }
       },
       "related": ["deposit", "balanceOf"]
@@ -54,10 +54,11 @@
     "balanceOf": {
       "title": "Balance",
       "description": "Check the WETH balance of any address.",
+      "group": "erc20",
       "params": {
         "_0": { "label": "holder", "type": "address" }
       },
-      "returns": { "_0": { "type": "eth" } },
+      "returns": { "_0": { "label": "balance", "type": "token-amount" } },
       "examples": [
         {
           "label": "Check Vitalik's balance",
@@ -68,49 +69,57 @@
     "totalSupply": {
       "title": "Total Supply",
       "description": "Total amount of WETH in existence (ETH locked in the contract).",
-      "returns": { "_0": { "type": "eth" } }
+      "group": "erc20",
+      "returns": { "_0": { "label": "total supply", "type": "token-amount" } }
     },
     "allowance": {
       "description": "Check how much WETH an address has approved another address to spend.",
-      "returns": { "_0": { "type": "eth" } }
+      "group": "erc20",
+      "returns": { "_0": { "label": "allowance", "type": "token-amount" } }
     },
     "approve": {
       "description": "Approve a spender to transfer up to the given amount of your WETH.",
-      "intent": "Approve {guy} to spend {wad} WETH",
+      "group": "erc20",
+      "intent": "Approve {guy} to spend {wad}",
       "params": {
         "guy": {
           "label": "spender",
           "description": "Address to approve",
           "type": "address"
         },
-        "wad": { "label": "amount", "type": "eth" }
+        "wad": { "label": "amount", "type": "token-amount" }
       }
     },
     "transfer": {
       "description": "Transfer WETH to another address.",
-      "intent": "Transfer {wad} WETH to {dst}",
+      "group": "erc20",
+      "intent": "Transfer {wad} to {dst}",
       "params": {
         "dst": { "label": "recipient", "type": "address" },
-        "wad": { "label": "amount", "type": "eth" }
+        "wad": { "label": "amount", "type": "token-amount" }
       }
     },
     "transferFrom": {
       "description": "Transfer WETH from one address to another, using a previously set allowance.",
-      "intent": "Transfer {wad} WETH from {src} to {dst}",
+      "group": "erc20",
+      "intent": "Transfer {wad} from {src} to {dst}",
       "params": {
         "src": { "label": "from", "type": "address" },
         "dst": { "label": "to", "type": "address" },
-        "wad": { "label": "amount", "type": "eth" }
+        "wad": { "label": "amount", "type": "token-amount" }
       }
     },
     "name": {
-      "description": "The name of the token (Wrapped Ether)."
+      "description": "The name of the token (Wrapped Ether).",
+      "group": "erc20"
     },
     "symbol": {
-      "description": "The token symbol (WETH)."
+      "description": "The token symbol (WETH).",
+      "group": "erc20"
     },
     "decimals": {
-      "description": "Number of decimal places (18, same as ETH)."
+      "description": "Number of decimal places (18, same as ETH).",
+      "group": "erc20"
     }
   },
   "events": {
@@ -133,7 +142,7 @@
       "params": {
         "src": { "label": "owner" },
         "guy": { "label": "spender" },
-        "wad": { "label": "amount", "type": "eth" }
+        "wad": { "label": "amount", "type": "token-amount" }
       }
     },
     "Transfer": {
@@ -141,7 +150,7 @@
       "params": {
         "src": { "label": "from" },
         "dst": { "label": "to" },
-        "wad": { "label": "amount", "type": "eth" }
+        "wad": { "label": "amount", "type": "token-amount" }
       }
     }
   }

@@ -28,7 +28,13 @@
       "title": "Total Supply",
       "description": "Total amount of tokens in existence.",
       "stateMutability": "view",
-      "group": "erc20"
+      "group": "erc20",
+      "returns": {
+        "_0": {
+          "label": "total supply",
+          "type": "token-amount"
+        }
+      }
     },
     "balanceOf": {
       "title": "Balance",
@@ -39,6 +45,12 @@
         "_0": {
           "label": "holder",
           "type": "address"
+        }
+      },
+      "returns": {
+        "_0": {
+          "label": "balance",
+          "type": "token-amount"
         }
       }
     },
@@ -55,6 +67,12 @@
           "autofill": "connected-address",
           "hidden": true
         }
+      },
+      "returns": {
+        "_0": {
+          "label": "balance",
+          "type": "token-amount"
+        }
       }
     },
     "allowance": {
@@ -70,6 +88,12 @@
         "_1": {
           "label": "spender",
           "type": "address"
+        }
+      },
+      "returns": {
+        "_0": {
+          "label": "allowance",
+          "type": "token-amount"
         }
       }
     },
@@ -90,13 +114,19 @@
           "label": "spender",
           "type": "address"
         }
+      },
+      "returns": {
+        "_0": {
+          "label": "allowance",
+          "type": "token-amount"
+        }
       }
     },
     "approve": {
       "title": "Approve",
       "description": "Approve a spender to transfer up to the given amount of your tokens.",
       "group": "erc20",
-      "intent": "Approve {_0} to spend {_1} tokens",
+      "intent": "Approve {_0} to spend {_1}",
       "warning": "Approving unlimited amounts is common but carries risk if the spender contract is compromised.",
       "params": {
         "_0": {
@@ -104,7 +134,8 @@
           "type": "address"
         },
         "_1": {
-          "label": "amount"
+          "label": "amount",
+          "type": "token-amount"
         }
       },
       "related": [
@@ -170,14 +201,15 @@
       "title": "Transfer",
       "description": "Transfer tokens to another address.",
       "group": "erc20",
-      "intent": "Transfer {_1} tokens to {_0}",
+      "intent": "Transfer {_1} to {_0}",
       "params": {
         "_0": {
           "label": "recipient",
           "type": "address"
         },
         "_1": {
-          "label": "amount"
+          "label": "amount",
+          "type": "token-amount"
         }
       },
       "related": [
@@ -189,6 +221,7 @@
       "title": "Transfer From",
       "description": "Transfer tokens from one address to another, using a previously set allowance.",
       "group": "erc20",
+      "intent": "Transfer {_2} from {_0} to {_1}",
       "params": {
         "_0": {
           "label": "from",
@@ -199,7 +232,8 @@
           "type": "address"
         },
         "_2": {
-          "label": "amount"
+          "label": "amount",
+          "type": "token-amount"
         }
       },
       "related": [
@@ -245,28 +279,30 @@
     "Transfer": {
       "description": "Emitted when tokens are transferred.",
       "params": {
-        "from": {
+        "_0": {
           "label": "from"
         },
-        "to": {
+        "_1": {
           "label": "to"
         },
-        "value": {
-          "label": "amount"
+        "_2": {
+          "label": "amount",
+          "type": "token-amount"
         }
       }
     },
     "Approval": {
       "description": "Emitted when an approval is set.",
       "params": {
-        "owner": {
+        "_0": {
           "label": "owner"
         },
-        "spender": {
+        "_1": {
           "label": "spender"
         },
-        "value": {
-          "label": "amount"
+        "_2": {
+          "label": "amount",
+          "type": "token-amount"
         }
       }
     }

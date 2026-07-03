@@ -193,8 +193,21 @@ Each action entry MAY include the following fields. When the action's `function`
 - `hidden` (boolean): If `true`, suppresses the action from the default UI. If every authored action referencing a function is hidden, the function itself is hidden (no default is synthesized for it -- see [ABI-Synthesized Default Actions](#abi-synthesized-default-actions)).
 - `intent` (string): Human-readable sentence template rendered with formatted parameter values.
 - `related` (array of strings): Action identifiers of related actions.
-- `params` (object): Per-parameter metadata, keyed by ABI parameter name.
+- `params` (object): Per-parameter metadata, keyed by ABI parameter name or position -- see [Parameter Keys](#parameter-keys).
 - `value` (object): Metadata for the native currency (`msg.value`) sent with the call -- see [Transaction Value](#transaction-value).
+
+#### Parameter Keys
+
+Keys in `params` (and `returns`) identify an ABI parameter in one of two ways:
+
+- **Name key** -- the ABI parameter's name (e.g. `"spender"`). Only valid when the parameter is named in the ABI.
+- **Positional key** -- `_N`, where `N` is the parameter's zero-based position (e.g. `"_0"` for the first parameter). Positional keys resolve regardless of what the ABI names the parameter.
+
+When both a name key and a positional key describe the same parameter, the name key wins.
+
+Positional keys exist because parameter names are not part of a function's interface: `approve(address,uint256)` is the same ERC-20 function whether an implementation names its parameters `spender`/`amount` or `guy`/`wad`. Metadata that must apply across implementations -- interface files above all -- MUST use positional keys. Contract-specific files SHOULD prefer name keys for readability.
+
+Consumers MUST resolve both key forms everywhere parameter metadata is consumed: input rendering, locked-parameter [calldata matching](#matching-calldata-to-actions), [intent template](#intent-templates) placeholders (`{_0}` resolves positionally), and example values.
 
 #### Variant Actions
 
@@ -379,6 +392,8 @@ The `autofill` field specifies a source to pre-populate an input with. It is sep
 | `zero-address`      | The zero address (`0x000...000`) |
 | `block-timestamp`   | Current block timestamp          |
 
+An action whose hidden or disabled parameter (or `value`) autofills from `connected-address` cannot be invoked without a connected wallet -- there is no value to inject. Consumers SHOULD omit such actions from the default UI while no wallet is connected (e.g. the ERC-20 interface's `my-balance`), and list them once one is.
+
 #### Object Autofill Values
 
 For literal constants:
@@ -482,14 +497,14 @@ Common interface metadata (ERC-20, ERC-721, etc.) can be defined once and includ
 
 Includes support two formats:
 
-- **`interface:` prefix** -- references a named interface file in the `interfaces/` subdirectory relative to the `$schema` URL (e.g. `"interface:erc721"` resolves to `interfaces/erc721.json` next to the schema file). These files contain `groups`, `actions`, `events`, `errors`, and `messages`. Interface files MAY ship curated variant actions (e.g. ERC-20 ships `revoke`, `approve-max`, `my-balance`, `my-allowance` alongside the base actions).
+- **`interface:` prefix** -- references a named interface file in the `interfaces/` subdirectory relative to the `$schema` URL (e.g. `"interface:erc721"` resolves to `interfaces/erc721.json` next to the schema file). These files contain `groups`, `actions`, `events`, `errors`, and `messages`. Interface files MAY ship curated variant actions (e.g. ERC-20 ships `revoke`, `approve-max`, `my-balance`, `my-allowance` alongside the base actions). Because an interface file describes every implementation of the interface, its `params` and `returns` MUST use positional keys (see [Parameter Keys](#parameter-keys)) -- implementations disagree on parameter names.
 - **URL** -- fetches the metadata file from the given URL. The resolved file can live anywhere and follows the same structure.
 
 Multiple includes merge left-to-right. Contract-specific metadata is then applied on top.
 
 #### Merge Semantics
 
-The merge is _shallow per top-level key within each section_. When a contract defines an action that also exists in an included interface, the contract's entire action object replaces the interface's. There is no deep merge of `params`, `returns`, or other nested fields. This means if you override an action, you MUST re-declare everything you want to keep (params, returns, types, etc.).
+The merge is _shallow per top-level key within each section_. When a contract defines an action that also exists in an included interface, the contract's entire action object replaces the interface's. There is no deep merge of `params`, `returns`, or other nested fields. This means if you override an action, you MUST re-declare everything you want to keep (params, returns, types, `group`, etc.) -- an override that omits `group` silently drops the action out of the interface's group in consumer UIs.
 
 ```
 # Merge order for includes: ["interface:erc20", "interface:erc721"]
