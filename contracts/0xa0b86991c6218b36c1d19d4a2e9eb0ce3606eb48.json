@@ -1,0 +1,685 @@
+{
+  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "chainId": 1,
+  "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "includes": ["interface:erc20"],
+  "meta": {
+    "version": 1,
+    "lastUpdated": "2026-07-05T00:00:00Z",
+    "locale": "en"
+  },
+  "name": "USD Coin",
+  "symbol": "USDC",
+  "description": "Circle's fully reserved US-dollar stablecoin — the canonical USDC on Ethereum, redeemable 1:1 for dollars.",
+  "about": "## The canonical dollar stablecoin\n\nUSD Coin (USDC) is a fully reserved dollar stablecoin issued by [Circle](https://www.circle.com/usdc). Each USDC is redeemable 1:1 for US dollars held in cash and short-dated US Treasuries, with monthly third-party attestations. USDC uses **6 decimals** — one USDC is 1,000,000 base units.\n\n## Upgradeable, role-based design\n\nThis address is a `FiatTokenProxy` delegating to Circle's `FiatTokenV2_2` implementation, so the token's logic can be upgraded by Circle at any time. Operations are split across Circle-controlled roles:\n\n- **Owner** — replaces the other role holders\n- **Master minter** — authorizes minters and sets their minting allowances\n- **Minters** — mint new USDC as dollars are deposited and burn it on redemption\n- **Pauser** — can halt all transfers, approvals, minting, and burning\n- **Blacklister** — can freeze individual addresses entirely\n- **Rescuer** — can recover ERC-20 tokens accidentally sent to the contract\n\n## Gasless approvals and transfers\n\nUSDC supports **EIP-2612 permit** (signature-based approvals) and **EIP-3009 transfer authorizations** (signature-based transfers), letting relayers submit transactions and pay gas on the signer's behalf. Version 2.2 also accepts EIP-1271 signatures from smart contract wallets via the packed-signature variants. `receiveWithAuthorization` can only be submitted by the payee, which protects payments against front-running.\n\n## Compliance controls\n\nCircle can blacklist addresses — a blacklisted address can no longer send, receive, or approve USDC — and can pause the entire token. These controls exist to comply with legal requirements such as sanctions.",
+  "risks": [
+    "Circle can blacklist any address, freezing its USDC entirely",
+    "Upgradeable proxy — Circle can replace the token's logic at any time",
+    "Circle can pause the token, halting all transfers, approvals, and minting",
+    "Fiat-backed — value depends on Circle's reserves and redemption process, not onchain collateral"
+  ],
+  "category": "token",
+  "tags": ["token", "stablecoin", "usdc", "circle", "defi-primitive"],
+  "links": [
+    { "label": "Etherscan", "url": "https://etherscan.io/address/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" },
+    { "label": "Implementation (FiatTokenV2_2)", "url": "https://etherscan.io/address/0x43506849D7C04F9138D1A2050bbF3A0c054402dd" },
+    { "label": "Circle", "url": "https://www.circle.com/usdc" },
+    { "label": "Developer Docs", "url": "https://developers.circle.com/stablecoins" }
+  ],
+  "theme": {
+    "accent": "#2775ca",
+    "accentText": "#ffffff"
+  },
+  "groups": {
+    "erc20": { "label": "ERC-20", "order": 1 },
+    "gasless": {
+      "label": "Gasless Signatures",
+      "description": "Signature-based approvals and transfers (EIP-2612 and EIP-3009), typically submitted by relayers.",
+      "order": 2
+    },
+    "minting": {
+      "label": "Minting (Circle)",
+      "description": "Supply management by Circle-authorized minters.",
+      "order": 3
+    },
+    "compliance": { "label": "Compliance (Circle)", "order": 4 },
+    "admin": { "label": "Administration (Circle)", "order": 5 },
+    "info": { "label": "Token Info", "order": 6 }
+  },
+  "actions": {
+    "name": {
+      "description": "The name of the token (USD Coin).",
+      "group": "erc20"
+    },
+    "symbol": {
+      "description": "The token symbol (USDC).",
+      "group": "erc20"
+    },
+    "decimals": {
+      "description": "Number of decimal places (6 — one USDC is 1,000,000 base units).",
+      "group": "erc20"
+    },
+    "totalSupply": {
+      "description": "Total USDC in circulation on Ethereum.",
+      "group": "erc20",
+      "returns": { "_0": { "label": "total supply", "type": "token-amount" } }
+    },
+    "increaseAllowance": {
+      "title": "Increase Allowance",
+      "description": "Raise a spender's allowance by an increment — avoids the race condition of resetting an existing approval.",
+      "group": "erc20",
+      "intent": "Increase allowance of {spender} by {increment}",
+      "params": {
+        "spender": { "label": "spender", "type": "address" },
+        "increment": { "label": "amount", "type": "token-amount" }
+      },
+      "related": ["decreaseAllowance"]
+    },
+    "decreaseAllowance": {
+      "title": "Decrease Allowance",
+      "description": "Lower a spender's allowance by a decrement. Reverts if it exceeds the current allowance.",
+      "group": "erc20",
+      "intent": "Decrease allowance of {spender} by {decrement}",
+      "params": {
+        "spender": { "label": "spender", "type": "address" },
+        "decrement": { "label": "amount", "type": "token-amount" }
+      },
+      "related": ["increaseAllowance"]
+    },
+    "permit": {
+      "function": "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)",
+      "title": "Permit (EIP-2612)",
+      "description": "Apply an approval signed off-chain by the token holder. Anyone may submit it — typically a relayer paying gas.",
+      "group": "gasless",
+      "intent": "Set allowance of {spender} to {value}, signed by {owner}",
+      "params": {
+        "owner": {
+          "label": "owner",
+          "description": "The token holder who signed the approval.",
+          "type": "address"
+        },
+        "spender": { "label": "spender", "type": "address" },
+        "value": { "label": "amount", "type": "token-amount" },
+        "deadline": {
+          "label": "deadline",
+          "description": "Unix timestamp after which the signature expires.",
+          "type": "timestamp"
+        },
+        "v": { "label": "signature v" },
+        "r": { "label": "signature r" },
+        "s": { "label": "signature s" }
+      },
+      "related": ["permit-packed", "nonces"]
+    },
+    "permit-packed": {
+      "function": "permit(address,address,uint256,uint256,bytes)",
+      "title": "Permit (Packed Signature)",
+      "description": "Permit variant taking a packed signature. Also accepts EIP-1271 signatures from smart contract wallets.",
+      "group": "gasless",
+      "intent": "Set allowance of {spender} to {value}, signed by {owner}",
+      "params": {
+        "owner": { "label": "owner", "type": "address" },
+        "spender": { "label": "spender", "type": "address" },
+        "value": { "label": "amount", "type": "token-amount" },
+        "deadline": { "label": "deadline", "type": "timestamp" },
+        "signature": { "label": "signature" }
+      },
+      "related": ["permit"]
+    },
+    "transfer-with-authorization": {
+      "function": "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)",
+      "title": "Transfer With Authorization",
+      "description": "Execute a USDC transfer signed off-chain by the payer (EIP-3009). Anyone may submit it, e.g. a gasless relayer.",
+      "group": "gasless",
+      "intent": "Transfer {value} from {from} to {to} via signed authorization",
+      "params": {
+        "from": { "label": "payer", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "value": { "label": "amount", "type": "token-amount" },
+        "validAfter": {
+          "label": "valid after",
+          "description": "Unix time from which the authorization is valid.",
+          "type": "timestamp"
+        },
+        "validBefore": {
+          "label": "valid before",
+          "description": "Unix time at which the authorization expires.",
+          "type": "timestamp"
+        },
+        "nonce": {
+          "label": "nonce",
+          "description": "Random 32-byte nonce chosen by the payer (not sequential)."
+        },
+        "v": { "label": "signature v" },
+        "r": { "label": "signature r" },
+        "s": { "label": "signature s" }
+      },
+      "related": ["receive-with-authorization", "cancel-authorization", "authorizationState"]
+    },
+    "transfer-with-authorization-packed": {
+      "function": "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,bytes)",
+      "title": "Transfer With Authorization (Packed)",
+      "description": "Packed-signature variant of Transfer With Authorization. Also accepts EIP-1271 smart wallet signatures.",
+      "group": "gasless",
+      "intent": "Transfer {value} from {from} to {to} via signed authorization",
+      "params": {
+        "from": { "label": "payer", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "value": { "label": "amount", "type": "token-amount" },
+        "validAfter": { "label": "valid after", "type": "timestamp" },
+        "validBefore": { "label": "valid before", "type": "timestamp" },
+        "nonce": { "label": "nonce" },
+        "signature": { "label": "signature" }
+      },
+      "related": ["transfer-with-authorization"]
+    },
+    "receive-with-authorization": {
+      "function": "receiveWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)",
+      "title": "Receive With Authorization",
+      "description": "Pull a USDC payment signed by the payer (EIP-3009). Only the recipient may submit it, preventing front-running.",
+      "group": "gasless",
+      "warning": "Only the recipient (to) can submit this transaction.",
+      "intent": "Receive {value} from {from} via signed authorization",
+      "params": {
+        "from": { "label": "payer", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "value": { "label": "amount", "type": "token-amount" },
+        "validAfter": { "label": "valid after", "type": "timestamp" },
+        "validBefore": { "label": "valid before", "type": "timestamp" },
+        "nonce": {
+          "label": "nonce",
+          "description": "Random 32-byte nonce chosen by the payer (not sequential)."
+        },
+        "v": { "label": "signature v" },
+        "r": { "label": "signature r" },
+        "s": { "label": "signature s" }
+      },
+      "related": ["transfer-with-authorization", "receive-with-authorization-packed"]
+    },
+    "receive-with-authorization-packed": {
+      "function": "receiveWithAuthorization(address,address,uint256,uint256,uint256,bytes32,bytes)",
+      "title": "Receive With Authorization (Packed)",
+      "description": "Packed-signature variant of Receive With Authorization. Also accepts EIP-1271 smart wallet signatures.",
+      "group": "gasless",
+      "warning": "Only the recipient (to) can submit this transaction.",
+      "intent": "Receive {value} from {from} via signed authorization",
+      "params": {
+        "from": { "label": "payer", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "value": { "label": "amount", "type": "token-amount" },
+        "validAfter": { "label": "valid after", "type": "timestamp" },
+        "validBefore": { "label": "valid before", "type": "timestamp" },
+        "nonce": { "label": "nonce" },
+        "signature": { "label": "signature" }
+      },
+      "related": ["receive-with-authorization"]
+    },
+    "cancel-authorization": {
+      "function": "cancelAuthorization(address,bytes32,uint8,bytes32,bytes32)",
+      "title": "Cancel Authorization",
+      "description": "Cancel an unused transfer authorization by its nonce, using a cancellation signed by the authorizer.",
+      "group": "gasless",
+      "intent": "Cancel authorization {nonce} of {authorizer}",
+      "params": {
+        "authorizer": { "label": "authorizer", "type": "address" },
+        "nonce": { "label": "nonce" },
+        "v": { "label": "signature v" },
+        "r": { "label": "signature r" },
+        "s": { "label": "signature s" }
+      },
+      "related": ["authorizationState", "cancel-authorization-packed"]
+    },
+    "cancel-authorization-packed": {
+      "function": "cancelAuthorization(address,bytes32,bytes)",
+      "title": "Cancel Authorization (Packed)",
+      "description": "Packed-signature variant of Cancel Authorization. Also accepts EIP-1271 smart wallet signatures.",
+      "group": "gasless",
+      "intent": "Cancel authorization {nonce} of {authorizer}",
+      "params": {
+        "authorizer": { "label": "authorizer", "type": "address" },
+        "nonce": { "label": "nonce" },
+        "signature": { "label": "signature" }
+      },
+      "related": ["cancel-authorization"]
+    },
+    "nonces": {
+      "title": "Permit Nonce",
+      "description": "The next EIP-2612 permit nonce for an address. Each executed permit increments it.",
+      "group": "gasless",
+      "params": {
+        "owner": { "label": "owner", "type": "address" }
+      },
+      "returns": { "_0": { "label": "next nonce" } }
+    },
+    "authorizationState": {
+      "title": "Authorization State",
+      "description": "Whether an EIP-3009 authorization nonce has already been used or canceled.",
+      "group": "gasless",
+      "params": {
+        "authorizer": { "label": "authorizer", "type": "address" },
+        "nonce": { "label": "nonce" }
+      },
+      "returns": { "_0": { "label": "used", "type": "boolean" } }
+    },
+    "mint": {
+      "title": "Mint",
+      "description": "Create new USDC for a recipient. Restricted to Circle-configured minters, within their minting allowance.",
+      "group": "minting",
+      "warning": "Minter only — reverts for all other callers.",
+      "intent": "Mint {_amount} to {_to}",
+      "params": {
+        "_to": { "label": "recipient", "type": "address" },
+        "_amount": { "label": "amount", "type": "token-amount" }
+      },
+      "related": ["burn", "configureMinter", "minterAllowance"]
+    },
+    "burn": {
+      "title": "Burn",
+      "description": "Destroy USDC from the caller's own balance. Used by Circle minters when dollars are redeemed.",
+      "group": "minting",
+      "warning": "Minter only.",
+      "intent": "Burn {_amount}",
+      "params": {
+        "_amount": { "label": "amount", "type": "token-amount" }
+      },
+      "related": ["mint"]
+    },
+    "configureMinter": {
+      "title": "Configure Minter",
+      "description": "Authorize a minter and set the maximum amount it may mint. Only the master minter.",
+      "group": "minting",
+      "warning": "Master minter only.",
+      "intent": "Allow {minter} to mint up to {minterAllowedAmount}",
+      "params": {
+        "minter": { "label": "minter", "type": "address" },
+        "minterAllowedAmount": { "label": "minting allowance", "type": "token-amount" }
+      },
+      "related": ["removeMinter", "minterAllowance", "isMinter"]
+    },
+    "removeMinter": {
+      "title": "Remove Minter",
+      "description": "Revoke a minter's authorization entirely. Only the master minter.",
+      "group": "minting",
+      "warning": "Master minter only.",
+      "intent": "Remove minter {minter}",
+      "params": {
+        "minter": { "label": "minter", "type": "address" }
+      },
+      "related": ["configureMinter"]
+    },
+    "minterAllowance": {
+      "title": "Minter Allowance",
+      "description": "How much USDC a configured minter may still mint.",
+      "group": "minting",
+      "params": {
+        "minter": { "label": "minter", "type": "address" }
+      },
+      "returns": { "_0": { "label": "remaining allowance", "type": "token-amount" } }
+    },
+    "isMinter": {
+      "title": "Is Minter",
+      "description": "Check whether an address is a configured minter.",
+      "group": "minting",
+      "params": {
+        "account": { "label": "account", "type": "address" }
+      },
+      "returns": { "_0": { "label": "is minter", "type": "boolean" } }
+    },
+    "masterMinter": {
+      "title": "Master Minter",
+      "description": "The Circle-controlled address that configures and removes minters.",
+      "group": "minting",
+      "returns": { "_0": { "label": "master minter", "type": "address" } }
+    },
+    "blacklist": {
+      "title": "Blacklist Address",
+      "description": "Freeze an address — it can no longer send, receive, or approve USDC. Only the blacklister.",
+      "group": "compliance",
+      "warning": "Blacklister only.",
+      "intent": "Blacklist {_account}",
+      "params": {
+        "_account": { "label": "account", "type": "address" }
+      },
+      "related": ["unBlacklist", "isBlacklisted"]
+    },
+    "unBlacklist": {
+      "title": "Remove From Blacklist",
+      "description": "Unfreeze a previously blacklisted address. Only the blacklister.",
+      "group": "compliance",
+      "warning": "Blacklister only.",
+      "intent": "Remove {_account} from the blacklist",
+      "params": {
+        "_account": { "label": "account", "type": "address" }
+      },
+      "related": ["blacklist", "isBlacklisted"]
+    },
+    "isBlacklisted": {
+      "title": "Is Blacklisted",
+      "description": "Check whether an address is currently frozen by Circle.",
+      "group": "compliance",
+      "params": {
+        "_account": { "label": "account", "type": "address" }
+      },
+      "returns": { "_0": { "label": "blacklisted", "type": "boolean" } }
+    },
+    "blacklister": {
+      "title": "Blacklister",
+      "description": "The Circle-controlled address that can freeze and unfreeze accounts.",
+      "group": "compliance",
+      "returns": { "_0": { "label": "blacklister", "type": "address" } }
+    },
+    "pause": {
+      "title": "Pause",
+      "description": "Halt all transfers, approvals, minting, and burning. Only the pauser.",
+      "group": "admin",
+      "warning": "Pauser only.",
+      "related": ["unpause", "paused"]
+    },
+    "unpause": {
+      "title": "Unpause",
+      "description": "Resume normal operation after a pause. Only the pauser.",
+      "group": "admin",
+      "warning": "Pauser only.",
+      "related": ["pause", "paused"]
+    },
+    "paused": {
+      "title": "Paused",
+      "description": "Whether the token is currently paused.",
+      "group": "admin",
+      "returns": { "_0": { "label": "paused", "type": "boolean" } }
+    },
+    "pauser": {
+      "title": "Pauser",
+      "description": "The Circle-controlled address that can pause and unpause the token.",
+      "group": "admin",
+      "returns": { "_0": { "label": "pauser", "type": "address" } }
+    },
+    "owner": {
+      "title": "Owner",
+      "description": "The contract owner (Circle). Can replace every role holder.",
+      "group": "admin",
+      "returns": { "_0": { "label": "owner", "type": "address" } }
+    },
+    "transferOwnership": {
+      "title": "Transfer Ownership",
+      "description": "Transfer the owner role to a new address. Only the owner.",
+      "group": "admin",
+      "warning": "Owner only.",
+      "intent": "Transfer ownership to {newOwner}",
+      "params": {
+        "newOwner": { "label": "new owner", "type": "address" }
+      }
+    },
+    "updateMasterMinter": {
+      "title": "Update Master Minter",
+      "description": "Set a new master minter. Only the owner.",
+      "group": "admin",
+      "warning": "Owner only.",
+      "params": {
+        "_newMasterMinter": { "label": "new master minter", "type": "address" }
+      }
+    },
+    "updateBlacklister": {
+      "title": "Update Blacklister",
+      "description": "Set a new blacklister. Only the owner.",
+      "group": "admin",
+      "warning": "Owner only.",
+      "params": {
+        "_newBlacklister": { "label": "new blacklister", "type": "address" }
+      }
+    },
+    "updatePauser": {
+      "title": "Update Pauser",
+      "description": "Set a new pauser. Only the owner.",
+      "group": "admin",
+      "warning": "Owner only.",
+      "params": {
+        "_newPauser": { "label": "new pauser", "type": "address" }
+      }
+    },
+    "updateRescuer": {
+      "title": "Update Rescuer",
+      "description": "Set a new rescuer. Only the owner.",
+      "group": "admin",
+      "warning": "Owner only.",
+      "params": {
+        "newRescuer": { "label": "new rescuer", "type": "address" }
+      }
+    },
+    "rescueERC20": {
+      "title": "Rescue Tokens",
+      "description": "Send ERC-20 tokens stuck in this contract to a recovery address. Only the rescuer.",
+      "group": "admin",
+      "warning": "Rescuer only.",
+      "intent": "Rescue {amount} of {tokenContract} to {to}",
+      "params": {
+        "tokenContract": { "label": "token", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "amount": {
+          "label": "amount",
+          "description": "Raw amount in the rescued token's smallest unit."
+        }
+      }
+    },
+    "rescuer": {
+      "title": "Rescuer",
+      "description": "The Circle-controlled address that can recover tokens sent to this contract.",
+      "group": "admin",
+      "returns": { "_0": { "label": "rescuer", "type": "address" } }
+    },
+    "currency": {
+      "title": "Currency",
+      "description": "The fiat currency the token represents (USD).",
+      "group": "info"
+    },
+    "version": {
+      "title": "Version",
+      "description": "The implementation version string (2).",
+      "group": "info"
+    },
+    "DOMAIN_SEPARATOR": {
+      "description": "EIP-712 domain separator used for permit and authorization signatures.",
+      "group": "info",
+      "hidden": true
+    },
+    "PERMIT_TYPEHASH": {
+      "description": "EIP-712 typehash constant for Permit.",
+      "group": "info",
+      "hidden": true
+    },
+    "TRANSFER_WITH_AUTHORIZATION_TYPEHASH": {
+      "description": "EIP-712 typehash constant for TransferWithAuthorization.",
+      "group": "info",
+      "hidden": true
+    },
+    "RECEIVE_WITH_AUTHORIZATION_TYPEHASH": {
+      "description": "EIP-712 typehash constant for ReceiveWithAuthorization.",
+      "group": "info",
+      "hidden": true
+    },
+    "CANCEL_AUTHORIZATION_TYPEHASH": {
+      "description": "EIP-712 typehash constant for CancelAuthorization.",
+      "group": "info",
+      "hidden": true
+    },
+    "initialize": {
+      "group": "info",
+      "hidden": true,
+      "deprecated": "USDC is fully initialized — calling this reverts."
+    },
+    "initializeV2": {
+      "group": "info",
+      "hidden": true,
+      "deprecated": "USDC is fully initialized — calling this reverts."
+    },
+    "initializeV2_1": {
+      "group": "info",
+      "hidden": true,
+      "deprecated": "USDC is fully initialized — calling this reverts."
+    },
+    "initializeV2_2": {
+      "group": "info",
+      "hidden": true,
+      "deprecated": "USDC is fully initialized — calling this reverts."
+    }
+  },
+  "messages": {
+    "TransferWithAuthorization": {
+      "title": "Transfer Authorization (EIP-3009)",
+      "description": "Authorize a one-time USDC transfer from your wallet that anyone may submit onchain (e.g. a gasless relayer).",
+      "warning": "Once valid, anyone can execute this transfer. Verify the recipient, amount, and validity window before signing.",
+      "intent": "Transfer {value} from {from} to {to}",
+      "fields": {
+        "from": { "label": "payer", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "value": {
+          "label": "amount",
+          "description": "The exact amount that will be transferred.",
+          "type": "token-amount"
+        },
+        "validAfter": { "label": "valid after", "type": "timestamp" },
+        "validBefore": { "label": "valid before", "type": "timestamp" },
+        "nonce": {
+          "label": "nonce",
+          "description": "Random 32-byte value; each authorization needs a unique nonce."
+        }
+      }
+    },
+    "ReceiveWithAuthorization": {
+      "title": "Payment Authorization (EIP-3009)",
+      "description": "Authorize a payee to pull a one-time USDC payment. Only the payee can submit it onchain.",
+      "warning": "The recipient can withdraw the stated amount from your wallet once the authorization becomes valid.",
+      "intent": "Pay {value} to {to}",
+      "fields": {
+        "from": { "label": "payer", "type": "address" },
+        "to": { "label": "recipient", "type": "address" },
+        "value": {
+          "label": "amount",
+          "description": "The exact amount that will be transferred.",
+          "type": "token-amount"
+        },
+        "validAfter": { "label": "valid after", "type": "timestamp" },
+        "validBefore": { "label": "valid before", "type": "timestamp" },
+        "nonce": {
+          "label": "nonce",
+          "description": "Random 32-byte value; each authorization needs a unique nonce."
+        }
+      }
+    },
+    "CancelAuthorization": {
+      "title": "Cancel Authorization (EIP-3009)",
+      "description": "Cancel a signed transfer authorization that has not been used yet.",
+      "intent": "Cancel authorization {nonce}",
+      "fields": {
+        "authorizer": { "label": "authorizer", "type": "address" },
+        "nonce": { "label": "nonce" }
+      }
+    }
+  },
+  "events": {
+    "Mint": {
+      "description": "Emitted when a minter creates new USDC.",
+      "params": {
+        "minter": { "label": "minter" },
+        "to": { "label": "recipient" },
+        "amount": { "label": "amount", "type": "token-amount" }
+      }
+    },
+    "Burn": {
+      "description": "Emitted when a minter destroys USDC from its own balance.",
+      "params": {
+        "burner": { "label": "burner" },
+        "amount": { "label": "amount", "type": "token-amount" }
+      }
+    },
+    "MinterConfigured": {
+      "description": "Emitted when a minter is authorized or its minting allowance is updated.",
+      "params": {
+        "minter": { "label": "minter" },
+        "minterAllowedAmount": { "label": "minting allowance", "type": "token-amount" }
+      }
+    },
+    "MinterRemoved": {
+      "description": "Emitted when a minter's authorization is revoked.",
+      "params": {
+        "oldMinter": { "label": "minter" }
+      }
+    },
+    "MasterMinterChanged": {
+      "description": "Emitted when the master minter role is reassigned.",
+      "params": {
+        "newMasterMinter": { "label": "new master minter" }
+      }
+    },
+    "Blacklisted": {
+      "description": "Emitted when an address is frozen by the blacklister.",
+      "params": {
+        "_account": { "label": "account" }
+      }
+    },
+    "UnBlacklisted": {
+      "description": "Emitted when an address is removed from the blacklist.",
+      "params": {
+        "_account": { "label": "account" }
+      }
+    },
+    "BlacklisterChanged": {
+      "description": "Emitted when the blacklister role is reassigned.",
+      "params": {
+        "newBlacklister": { "label": "new blacklister" }
+      }
+    },
+    "Pause": {
+      "description": "Emitted when the token is paused — all transfers, approvals, and minting halt."
+    },
+    "Unpause": {
+      "description": "Emitted when the token resumes normal operation."
+    },
+    "PauserChanged": {
+      "description": "Emitted when the pauser role is reassigned.",
+      "params": {
+        "newAddress": { "label": "new pauser" }
+      }
+    },
+    "OwnershipTransferred": {
+      "description": "Emitted when contract ownership moves to a new address.",
+      "params": {
+        "previousOwner": { "label": "previous owner" },
+        "newOwner": { "label": "new owner" }
+      }
+    },
+    "RescuerChanged": {
+      "description": "Emitted when the rescuer role is reassigned.",
+      "params": {
+        "newRescuer": { "label": "new rescuer" }
+      }
+    },
+    "AuthorizationUsed": {
+      "description": "Emitted when an EIP-3009 authorization is executed.",
+      "params": {
+        "authorizer": { "label": "authorizer" },
+        "nonce": { "label": "nonce" }
+      }
+    },
+    "AuthorizationCanceled": {
+      "description": "Emitted when an unused EIP-3009 authorization is canceled.",
+      "params": {
+        "authorizer": { "label": "authorizer" },
+        "nonce": { "label": "nonce" }
+      }
+    },
+    "Upgraded": {
+      "description": "Emitted by the proxy when Circle upgrades the implementation contract.",
+      "params": {
+        "implementation": { "label": "implementation", "type": "address" }
+      }
+    },
+    "AdminChanged": {
+      "description": "Emitted by the proxy when its admin address changes.",
+      "params": {
+        "previousAdmin": { "label": "previous admin", "type": "address" },
+        "newAdmin": { "label": "new admin", "type": "address" }
+      }
+    }
+  }
+}
