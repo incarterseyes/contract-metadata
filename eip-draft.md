@@ -353,6 +353,9 @@ Types that need additional configuration MUST use an object form:
 // Token amount for a specific token
 { "type": "token-amount", "tokenAddress": "0x..." }
 
+// Token amount denominated in the token given by another parameter
+{ "type": "token-amount", "tokenParam": "tokenContract" }
+
 // Generic fixed-point amount (oracle price, share price, accounting unit)
 { "type": "amount", "decimals": 8, "symbol": "USD" }
 
@@ -370,14 +373,30 @@ Types that need additional configuration MUST use an object form:
 
 `eth`, `gwei`, `token-amount`, and `amount` share one formatting contract -- **display value = raw integer / 10^decimals**, rendered with a symbol. They differ only in where `decimals` and `symbol` come from:
 
-| Type           | decimals                       | symbol                  | asset                   |
-| -------------- | ------------------------------ | ----------------------- | ----------------------- |
-| `eth`          | 18 (fixed)                     | ETH (fixed)             | native                  |
-| `gwei`         | 9 (fixed)                      | gwei (fixed)            | native                  |
-| `token-amount` | on-chain `decimals()`          | on-chain `symbol()`     | token at `tokenAddress` |
-| `amount`       | `decimals` field (default 18)  | optional `symbol` field | none                    |
+| Type           | decimals                       | symbol                  | asset                    |
+| -------------- | ------------------------------ | ----------------------- | ------------------------ |
+| `eth`          | 18 (fixed)                     | ETH (fixed)             | native                   |
+| `gwei`         | 9 (fixed)                      | gwei (fixed)            | native                   |
+| `token-amount` | on-chain `decimals()`          | on-chain `symbol()`     | see token resolution     |
+| `amount`       | `decimals` field (default 18)  | optional `symbol` field | none                     |
 
 Use `eth` or `token-amount` when the asset has an identity; use `amount` only for fixed-point numbers with no asset -- oracle outputs, share prices, internal accounting units.
+
+#### Token Resolution
+
+The token a `token-amount` is denominated in resolves in one of three ways:
+
+- **`tokenAddress`** -- a fixed token contract address.
+- **`tokenParam`** -- the name (or `_N` positional key) of an `address` parameter in the same action, event, or message whose *value* identifies the token. This covers functions that pair a token parameter with an amount parameter (rescue/sweep functions, routers, vault deposits): `rescueERC20(tokenContract, to, amount)` types `amount` as `{ "type": "token-amount", "tokenParam": "tokenContract" }`.
+- **Neither** (including the bare string form) -- the token is the contract this document describes. The same default applies to `token-id`: without a `tokenAddress`, the ID refers to the described contract's tokens. This is what allows shared interface files (ERC-20, ERC-721) to annotate amounts without knowing any deployment's address.
+
+`tokenAddress` and `tokenParam` are mutually exclusive.
+
+Consumers resolve `decimals()` and `symbol()` from the token contract at display time and SHOULD cache the results -- both values are immutable in virtually all deployed tokens. A consumer that cannot resolve the token's decimals (unreachable RPC, pending lookup, non-conforming token) MUST NOT substitute a default; it SHOULD render the raw base-unit value and indicate that the token is unresolved. Guessing decimals displays a wrong number, which is strictly worse than an unformatted one.
+
+#### Unlimited Amounts
+
+An amount-like value equal to 2^256-1 conventionally means "no limit" (unlimited approvals, allowance sentinels). Consumers SHOULD render it as "Unlimited" -- with the resolved symbol where available (e.g. "Unlimited USDC") -- instead of a formatted number.
 
 ### Autofill
 
@@ -529,7 +548,7 @@ Off-chain signing flows (Permit, Seaport orders, etc.) MAY be described with the
       "fields": {
         "owner": { "label": "owner", "type": "address" },
         "spender": { "label": "spender", "type": "address" },
-        "value": { "label": "amount", "type": "eth" },
+        "value": { "label": "amount", "type": "token-amount" },
         "nonce": { "label": "nonce" },
         "deadline": { "label": "deadline", "type": "timestamp" }
       }

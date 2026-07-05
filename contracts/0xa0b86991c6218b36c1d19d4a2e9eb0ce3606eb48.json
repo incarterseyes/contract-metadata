@@ -457,7 +457,8 @@
         "to": { "label": "recipient", "type": "address" },
         "amount": {
           "label": "amount",
-          "description": "Raw amount in the rescued token's smallest unit."
+          "description": "Amount of the rescued token.",
+          "type": { "type": "token-amount", "tokenParam": "tokenContract" }
         }
       }
     },
