@@ -1,0 +1,36 @@
+{
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/interface.schema.json",
+  "interfaceId": "0x5b5e139f",
+  "groups": {
+    "erc721": {
+      "label": "ERC-721",
+      "order": 99
+    }
+  },
+  "actions": {
+    "name": {
+      "title": "Name",
+      "description": "The name of the token collection.",
+      "stateMutability": "view",
+      "group": "erc721"
+    },
+    "symbol": {
+      "title": "Symbol",
+      "description": "The token symbol.",
+      "stateMutability": "view",
+      "group": "erc721"
+    },
+    "tokenURI": {
+      "title": "Token URI",
+      "description": "Returns the metadata URI for a specific token.",
+      "stateMutability": "view",
+      "group": "erc721",
+      "params": {
+        "_0": {
+          "label": "token ID",
+          "type": "token-id"
+        }
+      }
+    }
+  }
+}

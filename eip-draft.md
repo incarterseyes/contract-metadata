@@ -34,12 +34,12 @@ A metadata file describes a single deployed contract:
 
 ```json
 {
-  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/schema.json",
   "chainId": 1,
   "address": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
   "name": "CryptoPunks",
   "description": "10,000 unique collectible pixel art characters on Ethereum.",
-  "image": "ipfs://QmTNgv3jx2HHfBjQX9RnKtxj2xv2xQDtbDXoRi5rJ3a46",
+  "image": "ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
   "groups": { ... },
   "actions": { ... },
   "events": { ... },
@@ -55,13 +55,23 @@ A metadata file describes a single deployed contract:
 | ----------- | -------- | -------- | ------------------------------------------------------------------------ |
 | `$schema`   | `string` | REQUIRED | URI pointing to the contract-metadata JSON Schema                        |
 | `chainId`   | `number` | REQUIRED | The chain ID of the network where the contract is deployed               |
-| `address`   | `string` | REQUIRED | The contract address (lowercase, checksummed addresses MUST be accepted) |
-| `includes`  | `array`  | OPTIONAL | Interface identifiers to include (e.g. `["interface:erc721"]`)           |
-| `meta`      | `object` | OPTIONAL | Document housekeeping (version, lastUpdated, locale, signature)          |
+| `address`   | `string` | REQUIRED | The contract address, stored lowercase (see [Address Normalization](#address-normalization)) |
+| `includes`  | `array`  | OPTIONAL | Interface identifiers or https URLs to include (e.g. `["interface:erc721"]`) |
+| `meta`      | `object` | OPTIONAL | Document housekeeping (version, lastUpdated, locale)                     |
+
+`chainId` MUST be a positive integer no greater than 2^53−1 (the IEEE-754 safe integer range), so documents survive JSON round-trips through consumers that parse numbers as doubles.
+
+#### Address Normalization
+
+Every address stored in a document — the `address` field, `collaborators` entries, and `tokenAddress` values — MUST be lowercase hex without EIP-55 checksum; the schema enforces this with a lowercase-only pattern. Consumers MUST normalize any address input — including checksummed forms — to lowercase before lookup, comparison, or validation. Storing one canonical form and normalizing at the boundary keeps documents byte-comparable and cache keys stable.
+
+#### Localization
+
+`meta.locale` declares the language of the document's human-readable strings as a BCP 47 language tag matching `^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$` (e.g. `en`, `de`, `pt-BR`). A document carries exactly one locale; distributing the same contract's metadata in multiple languages is explicitly deferred to a future extension.
 
 #### Contract-Level Context
 
-The following fields provide context about the contract itself. The fields `name`, `symbol`, `description`, `image`, `banner_image`, `featured_image`, `external_link`, and `collaborators` are compatible with [ERC-7572](./eip-7572.md) -- a contract-metadata document with `name` present is a valid ERC-7572 `contractURI()` response. The `theme` color model is inspired by [ENSIP-18](https://docs.ens.domains/ensip/18).
+The following fields provide context about the contract itself. The fields `name`, `symbol`, `description`, `image`, `banner_image`, `featured_image`, `external_link`, and `collaborators` are compatible with [ERC-7572](./eip-7572.md) -- a contract-metadata document with `name` present is a valid ERC-7572 `contractURI()` response. The `theme` color model is inspired by ENSIP-18.
 
 | Field            | Type     | Required | Description                                                              |
 | ---------------- | -------- | -------- | ------------------------------------------------------------------------ |
@@ -101,21 +111,18 @@ Long-form context -- history, multi-paragraph explanations, and Markdown formatt
 
 ```json
 {
-  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/schema.json",
   "chainId": 1,
   "address": "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
   "name": "CryptoPunks",
   "symbol": "PUNK",
   "description": "One of the earliest NFT projects, predating the ERC-721 standard...",
-  "image": "ipfs://QmTNgv3jx2HHfBjQX9RnKtxj2xv2xQDtbDXoRi5rJ3a46",
+  "image": "ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
   "external_link": "https://cryptopunks.app",
   "category": "nft",
   "tags": ["nft", "collectible", "pfp"],
   "links": [{ "label": "Website", "url": "https://..." }],
   "risks": ["No upgradeability. Bugs are permanent"],
-  "audits": [
-    { "auditor": "Trail of Bits", "url": "https://...", "date": "2023-01-15" }
-  ],
   "about": "## 10,000 unique collectible characters\n\nCryptoPunks extend the collecting impulse into the digital realm...",
   "theme": {
     "background": "#000000",
@@ -126,6 +133,8 @@ Long-form context -- history, multi-paragraph explanations, and Markdown formatt
   }
 }
 ```
+
+An `audits` entry references a real security audit: `{ "auditor": "Fictional Audit Collective", "url": "https://audits.example/report.pdf", "date": "2026-01-15", "scope": "Core vault accounting" }` (auditor and URL above are illustrative placeholders — never fabricate audit references for real contracts).
 
 ### Action, Event, and Error Keys
 
@@ -194,7 +203,11 @@ Each action entry MAY include the following fields. When the action's `function`
 - `intent` (string): Human-readable sentence template rendered with formatted parameter values.
 - `related` (array of strings): Action identifiers of related actions.
 - `params` (object): Per-parameter metadata, keyed by ABI parameter name or position -- see [Parameter Keys](#parameter-keys).
+- `returns` (object): Per-return-value metadata, keyed by ABI return name or position, with the same shape as `params` entries (label, description, type).
 - `value` (object): Metadata for the native currency (`msg.value`) sent with the call -- see [Transaction Value](#transaction-value).
+- `stateMutability` (string, one of `view`, `pure`, `nonpayable`, `payable`): Overrides the ABI's `stateMutability`. This field MUST only be used to correct legacy ABIs that lack the field (e.g. pre-Byzantium contracts); when the ABI declares a `stateMutability`, consumers MUST prefer the ABI's value.
+- `examples` (array): Preset example invocations for quick interaction. Each entry has a `label` and a `params` object mapping parameter keys (name or positional) to prefilled string values.
+- `deprecated` (string): Deprecation notice. When set, consumers SHOULD de-emphasize the action in the UI and surface the notice before invocation.
 
 #### Parameter Keys
 
@@ -288,7 +301,7 @@ Parameters in an action MAY set two input-side flags that control how the input 
 | `hidden`   | Do not render an input; inject the `autofill` value at call time. REQUIRES `autofill`.                |
 | `disabled` | Render the input but make it non-editable; display the autofilled value. REQUIRES `autofill`.         |
 
-`hidden: true` and `disabled: true` are mutually exclusive. The input-side `hidden` is distinct from the display-side `type: "hidden"` semantic type -- one controls whether an input is rendered for writes, the other controls whether a value is rendered in read contexts.
+`hidden: true` and `disabled: true` are mutually exclusive, and each requires `autofill` to be present. The schema enforces both rules (`dependentRequired` plus a `not` clause forbidding the combination). The input-side `hidden` is distinct from the display-side `type: "hidden"` semantic type -- one controls whether an input is rendered for writes, the other controls whether a value is rendered in read contexts.
 
 #### Transaction Value
 
@@ -431,9 +444,31 @@ A parameter MAY combine `type` and `autofill`:
 }
 ```
 
+### Validation Rules
+
+Parameters and the transaction `value` MAY declare a `validation` object constraining user input before submission:
+
+| Field     | Type     | Meaning                                                                  |
+| --------- | -------- | ------------------------------------------------------------------------ |
+| `min`     | `string` | Minimum accepted value, as a decimal string (strings support the full uint256 range) |
+| `max`     | `string` | Maximum accepted value, as a decimal string                              |
+| `enum`    | `array`  | Allowed values, each `{ "value": "...", "label": "..." }`; input SHOULD render as a selection |
+| `pattern` | `string` | Regular expression the raw input must match                              |
+| `message` | `string` | Human-readable error shown when a rule fails                             |
+
+```json
+"punkIndex": {
+  "label": "punk index",
+  "type": "token-id",
+  "validation": { "min": "0", "max": "9999", "message": "Punk indices run from 0 to 9999." }
+}
+```
+
+Validation rules are a UX aid, not a security boundary: they run client-side before submission, and the contract remains the sole authority on what it accepts.
+
 ### Groups
 
-Actions MAY be organized into named groups. Each group MUST have a `label` and SHOULD have an `order` for display sorting:
+Actions MAY be organized into named groups. Group keys follow the same grammar as action identifiers (`^[a-zA-Z_][a-zA-Z0-9_-]*$`). Each group MUST have a `label` and SHOULD have an `order` for display sorting (the schema requires only `label`, matching this SHOULD):
 
 ```json
 {
@@ -503,7 +538,7 @@ Common interface metadata (ERC-20, ERC-721, etc.) can be defined once and includ
 ```json
 {
   "includes": ["interface:erc721", "https://example.com/metadata.json"],
-  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/schema.json",
   "chainId": 1,
   "address": "0x036721e5a769cc48b3189efbb9cce4471e8a48b1",
   "name": "Checks Originals",
@@ -514,12 +549,18 @@ Common interface metadata (ERC-20, ERC-721, etc.) can be defined once and includ
 }
 ```
 
-Includes support two formats:
+Includes support two formats, and each entry MUST match `^(interface:[a-z0-9-]+|https://.+)$`:
 
-- **`interface:` prefix** -- references a named interface file in the `interfaces/` subdirectory relative to the `$schema` URL (e.g. `"interface:erc721"` resolves to `interfaces/erc721.json` next to the schema file). These files contain `groups`, `actions`, `events`, `errors`, and `messages`. Interface files MAY ship curated variant actions (e.g. ERC-20 ships `revoke`, `approve-max`, `my-balance`, `my-allowance` alongside the base actions). Because an interface file describes every implementation of the interface, its `params` and `returns` MUST use positional keys (see [Parameter Keys](#parameter-keys)) -- implementations disagree on parameter names.
-- **URL** -- fetches the metadata file from the given URL. The resolved file can live anywhere and follows the same structure.
+- **`interface:` prefix** -- references a named interface file in the `interfaces/` subdirectory relative to the `$schema` URL (e.g. with the canonical `$schema`, `"interface:erc721"` resolves to `https://evmnow.github.io/contract-metadata/v1/interfaces/erc721.json`). These files contain `groups`, `actions`, `events`, `errors`, and `messages`. Interface files MAY ship curated variant actions (e.g. ERC-20 ships `revoke`, `approve-max`, `my-balance`, `my-allowance` alongside the base actions). Because an interface file describes every implementation of the interface, its `params` and `returns` MUST use positional keys (see [Parameter Keys](#parameter-keys)) -- implementations disagree on parameter names.
+- **URL** -- fetches the metadata file from the given URL. URL includes MUST use `https:`; consumers MUST reject other schemes. The resolved file can live anywhere and follows the same structure. See Security Considerations for the trust implications of URL includes.
+
+**Namespace rule:** `interface:` names resolve relative to the document's `$schema` host -- `interface:erc721` under one schema host and the same name under another are distinct namespaces and may resolve to different files. Publishers who fork the schema also own their interface namespace.
 
 Multiple includes merge left-to-right. Contract-specific metadata is then applied on top.
+
+Interface files validate against their own schema (`interface.schema.json`, published next to the contract schema -- e.g. `https://evmnow.github.io/contract-metadata/v1/interface.schema.json`) and SHOULD declare it as their `$schema`. Interface files MAY themselves declare `includes` (composing other interface files with the same merge semantics); consumers MUST detect include cycles and reject documents that contain them. Interface files MAY also declare an `interfaceId` -- the 4-byte ERC-165 identifier (e.g. `0x36372b07` for ERC-20, `0x80ac58cd` for ERC-721) -- which consumers MAY use with `supportsInterface()` to auto-select interface metadata for contracts that have no document of their own.
+
+**Dropping unimplemented actions:** an included interface file may describe functions a specific contract does not implement (e.g. `interface:erc721-metadata` on a collection without `tokenURI`). Consumers with access to the ABI MUST drop actions whose resolved function reference does not exist in the contract's ABI -- they are not rendered, and they do not participate in calldata matching.
 
 #### Merge Semantics
 
@@ -532,6 +573,19 @@ The merge is _shallow per top-level key within each section_. When a contract de
 3. Merge erc721.json   -> { actions: { transfer: {from erc721}, approve: {from erc721}, revoke: {from erc721}, ownerOf: {from erc721} } }
 4. Merge contract file -> { actions: { transfer: {from contract}, approve: {from erc721}, revoke: {from erc721}, ownerOf: {from erc721}, mint: {from contract} } }
 ```
+
+### Discovery
+
+Consumers locate the metadata document for a contract in two ways, in order of preference:
+
+1. **`contractURI()` (primary).** If the contract implements [ERC-7572](./eip-7572.md), consumers SHOULD call `contractURI()` and treat the returned document as this contract's metadata when it validates against this specification's schema. This channel is authoritative -- the contract itself points at its metadata -- and requires no registry.
+2. **Repository lookup (secondary).** Publishers MAY serve a directory of documents under a base URL using the canonical layout `{base}/contracts/{chainId}/{address}.json`, with `{address}` lowercase. Consumers derive the URL from the chain ID and the normalized address and fetch it directly; a 404 means the repository has no document for that contract. The reference repository's GitHub Pages deployment (`https://evmnow.github.io/contract-metadata/contracts/{chainId}/{address}.json`) implements this layout.
+
+A consumer MAY consult multiple repositories; documents from different sources describe the same contract and are ranked by the consumer's own trust policy (see Security Considerations).
+
+### Versioning
+
+The `/v1/` path segment in the canonical schema URL is the format's major version, and `$id` in the published schema encodes it. Within a major version, changes are strictly additive -- new optional fields and new semantic types may appear in place, and documents that validated before continue to validate. Breaking changes require a new major version under a new URL (`/v2/`). Consumers encountering a document whose `$schema` names an unknown major version SHOULD fall back to ignoring the document rather than misinterpreting it.
 
 ### EIP-712 Message Metadata
 
@@ -575,7 +629,7 @@ Publishers MAY use custom extension objects on the root document, actions, event
       },
       "_component": {
         "type": "color-map",
-        "columns": "8"
+        "props": { "columns": 8 }
       }
     }
   }
@@ -616,29 +670,40 @@ Keying metadata directly by ABI name creates a 1:1 coupling that cannot express 
 
 A payable call is not fully described by its arguments -- `WETH.deposit()` takes no parameters at all, yet the single most important fact about it is how much ETH is attached. Without a `value` object, the best a publisher can do is warn about it in prose, which no wallet can render as an input or verify in a preview. Treating transaction value like a parameter (same label/autofill/lock semantics) closes that gap with no new concepts.
 
+### Relationship to ERC-7730
+
+[ERC-7730](./eip-7730.md) also attaches human-readable descriptions to contract calls, but the two standards target different problems. ERC-7730 is **clear-signing metadata**: its unit of description is a single function or EIP-712 message, its output is a line-by-line rendering of one payload on a hardware wallet's constrained display, and its trust model is a curated registry vetted by wallet vendors. This specification is **interaction UX metadata**: it describes the whole contract as a product surface -- contract-level context (about, risks, links, theme), action variants decoupled from the ABI (`revoke` vs `approve`), input construction (autofill, validation, locked parameters, semantic input widgets), grouping and navigation, and event/error enrichment. ERC-7730 has no concept of authoring a *new* UI entry for an existing function or of collecting user input; this specification does not attempt to define byte-exact display rules for signing devices.
+
+The two are complementary rather than competing: a wallet can build its interaction UI from a contract-metadata document and still render the final signing screen from ERC-7730 metadata for the resolved calldata. A publisher can mechanically derive a large part of an ERC-7730 descriptor (function labels, parameter labels, amount formats) from a contract-metadata document, while the reverse loses all interaction-level structure.
+
+### Future Work
+
+Document authenticity via cryptographic signing (an embedded or detached signature over the document) is deliberately deferred; consumers today anchor trust in the transport channel and source (see Security Considerations). Multi-locale distribution of the same document is likewise deferred to a future extension (see [Localization](#localization)).
+
 ## Backwards Compatibility
 
-This EIP introduces a new metadata format and does not modify any existing standards. It is fully complementary to ABIs, NatSpec, ERC-7572, and EIP-7730.
+This EIP introduces a new metadata format and does not modify any existing standards. It is fully complementary to ABIs, NatSpec, ERC-7572, and ERC-7730.
 
-Contract-level fields (`name`, `symbol`, `description`, `image`, `banner_image`, `featured_image`, `external_link`, `collaborators`) are placed at the top level to maintain backwards compatibility with [ERC-7572](./eip-7572.md). A contract-metadata document with `name` present is a valid ERC-7572 `contractURI()` response -- existing consumers that understand only ERC-7572 will read the fields they recognize and ignore the rest.
+Contract-level fields (`name`, `symbol`, `description`, `image`, `banner_image`, `featured_image`, `external_link`, `collaborators`) are placed at the top level to maintain backwards compatibility with [ERC-7572](./eip-7572.md). The compatibility is directional: **every valid contract-metadata document is a valid ERC-7572 `contractURI()` payload, but not conversely.** Existing consumers that understand only ERC-7572 will read the fields they recognize and ignore the rest; in the other direction, many existing `contractURI()` documents are not valid contract-metadata documents -- most commonly because this specification caps `description` at 120 characters (see [Description Length](#description-length)) while ERC-7572 imposes no limit. Publishers migrating an ERC-7572 document move long-form text into `about`.
 
 ## Reference Implementation
 
-A reference implementation including JSON Schema definitions and a validation script is available at [https://github.com/1001-digital/contract-metadata](https://github.com/1001-digital/contract-metadata).
-
-The repository includes:
-
-- `schema/contract-metadata.schema.json` -- JSON Schema for contract metadata files
-- `schema/interface.schema.json` -- JSON Schema for interface files
-- `schema/interfaces/` -- Reusable interface metadata (ERC-20, ERC-721)
-- `contracts/` -- Example metadata files for deployed contracts
-- `validate.ts` -- Schema and semantic validation script
+The reference implementation -- the JSON Schemas (`contract-metadata.schema.json`, `interface.schema.json`), the reusable interface files (ERC-20, ERC-721 core/metadata/enumerable), example documents, and a schema-plus-semantics validation script -- is provided in this EIP's assets directory (per EIP-1, reference implementations belong in `../assets/`, not behind external links). A maintained copy, together with the published repository of metadata documents, lives in the `evmnow/contract-metadata` repository and is served at the canonical URLs given in [Discovery](#discovery).
 
 ## Security Considerations
 
 ### Metadata Integrity
 
-Contract metadata is an off-chain resource. Consumers MUST NOT trust metadata blindly -- it could be outdated, incorrect, or malicious. Metadata SHOULD be served from authenticated sources and MAY be signed (via the `meta.signature` field) to allow consumers to verify authorship.
+Contract metadata is an off-chain resource. Consumers MUST NOT trust metadata blindly -- it could be outdated, incorrect, or malicious. Metadata SHOULD be served from authenticated sources (TLS, content-addressed storage, or a repository whose review process the consumer trusts), and consumers SHOULD rank sources by their own trust policy. In-document authenticity signatures are deferred to future work (see Rationale).
+
+### URL Includes
+
+The `includes` mechanism can pull metadata from arbitrary `https:` URLs, which widens the trust surface of an otherwise trusted document:
+
+- URL includes MUST use `https:`; consumers MUST reject `http:` and every other scheme.
+- Fetching includes server-side turns a metadata consumer into a URL fetcher: implementers MUST treat include URLs as untrusted input and guard against SSRF (deny link-local, private-range, and internal hostnames; cap redirects, response sizes, and timeouts).
+- A compromised or repointed include URL silently rewrites the presentation of a trusted contract -- the containing document is unchanged, yet its merged actions, warnings, and labels can change arbitrarily. Consumers SHOULD pin content hashes for URL includes or restrict include origins to an allowlist, and SHOULD re-validate the merged result, not just the outer document.
+- Include resolution MUST enforce cycle detection and a recursion depth limit.
 
 ### Misleading Labels
 
@@ -654,4 +719,4 @@ Extensions are opaque to consumers that do not understand them. Consumers MUST i
 
 ## Copyright
 
-Copyright and related rights waived via [CC0](./LICENSE).
+Copyright and related rights waived via [CC0](../LICENSE.md).

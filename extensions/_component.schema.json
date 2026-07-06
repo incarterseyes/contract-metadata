@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://evmnow.github.io/contract-metadata/v1/extensions/_component.schema.json",
+  "title": "_component Extension",
+  "description": "Registers a custom UI component on an extensible metadata object. Either a component type string, or an object with a `type` and optional `props`. See extensions/_component.md.",
+  "oneOf": [
+    {
+      "type": "string",
+      "minLength": 1,
+      "description": "Component type identifier (string shorthand, no configuration)."
+    },
+    {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Component type identifier (e.g. \"sha256-content-prover\", \"color-picker\")."
+        },
+        "props": {
+          "type": "object",
+          "description": "Component-specific configuration passed to the component at runtime."
+        }
+      }
+    }
+  ]
+}

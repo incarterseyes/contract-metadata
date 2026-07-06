@@ -8,7 +8,9 @@
   "scripts": {
     "validate": "tsx validate.ts",
     "validate:contracts": "tsx validate.ts --contracts",
-    "validate:interfaces": "tsx validate.ts --interfaces"
+    "validate:interfaces": "tsx validate.ts --interfaces",
+    "validate:examples": "tsx validate.ts --examples",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@evmnow/sdk": "^0.6.0",
@@ -17,5 +19,6 @@
     "ajv-formats": "^3.0.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

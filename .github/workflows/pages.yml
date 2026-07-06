@@ -1,0 +1,52 @@
+name: Deploy Pages
+
+# Publishes the canonical schema and data endpoints:
+#   https://evmnow.github.io/contract-metadata/v1/schema.json
+#   https://evmnow.github.io/contract-metadata/v1/interface.schema.json
+#   https://evmnow.github.io/contract-metadata/v1/interfaces/<name>.json
+#   https://evmnow.github.io/contract-metadata/v1/extensions/<name>.schema.json
+#   https://evmnow.github.io/contract-metadata/contracts/{chainId}/{address}.json
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site/v1/interfaces _site/v1/extensions
+          cp schema/contract-metadata.schema.json _site/v1/schema.json
+          cp schema/interface.schema.json _site/v1/interface.schema.json
+          cp schema/interfaces/*.json _site/v1/interfaces/
+          cp extensions/*.schema.json _site/v1/extensions/
+          cp -r contracts _site/contracts
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

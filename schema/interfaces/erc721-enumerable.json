@@ -1,0 +1,18 @@
+{
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/interface.schema.json",
+  "interfaceId": "0x780e9d63",
+  "groups": {
+    "erc721": {
+      "label": "ERC-721",
+      "order": 99
+    }
+  },
+  "actions": {
+    "totalSupply": {
+      "title": "Total Supply",
+      "description": "Total number of tokens in existence.",
+      "stateMutability": "view",
+      "group": "erc721"
+    }
+  }
+}

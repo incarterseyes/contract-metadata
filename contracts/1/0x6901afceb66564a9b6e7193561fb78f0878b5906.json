@@ -1,5 +1,5 @@
 {
-  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/schema.json",
   "chainId": 1,
   "address": "0x6901afceb66564a9b6e7193561fb78f0878b5906",
   "meta": {

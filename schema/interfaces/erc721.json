@@ -1,4 +1,6 @@
 {
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/interface.schema.json",
+  "interfaceId": "0x80ac58cd",
   "groups": {
     "erc721": {
       "label": "ERC-721",
@@ -6,33 +8,20 @@
     }
   },
   "actions": {
-    "name": {
-      "title": "Name",
-      "description": "The name of the token collection.",
-      "stateMutability": "view",
-      "group": "erc721"
-    },
-    "symbol": {
-      "title": "Symbol",
-      "description": "The token symbol.",
-      "stateMutability": "view",
-      "group": "erc721"
-    },
-    "totalSupply": {
-      "title": "Total Supply",
-      "description": "Total number of tokens in existence.",
-      "stateMutability": "view",
-      "group": "erc721"
-    },
     "balanceOf": {
       "title": "Balance",
       "description": "Check how many tokens an address owns.",
       "stateMutability": "view",
       "group": "erc721",
       "params": {
-        "owner": {
+        "_0": {
           "label": "holder",
           "type": "address"
+        }
+      },
+      "returns": {
+        "_0": {
+          "label": "balance"
         }
       }
     },
@@ -43,11 +32,16 @@
       "stateMutability": "view",
       "group": "erc721",
       "params": {
-        "owner": {
+        "_0": {
           "label": "holder",
           "type": "address",
           "autofill": "connected-address",
           "hidden": true
+        }
+      },
+      "returns": {
+        "_0": {
+          "label": "balance"
         }
       }
     },
@@ -57,7 +51,7 @@
       "stateMutability": "view",
       "group": "erc721",
       "params": {
-        "tokenId": {
+        "_0": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -69,29 +63,17 @@
         }
       }
     },
-    "tokenURI": {
-      "title": "Token URI",
-      "description": "Returns the metadata URI for a specific token.",
-      "stateMutability": "view",
-      "group": "erc721",
-      "params": {
-        "tokenId": {
-          "label": "token ID",
-          "type": "token-id"
-        }
-      }
-    },
     "approve": {
       "title": "Approve",
       "description": "Approve an address to transfer a specific token on your behalf.",
       "group": "erc721",
-      "intent": "Approve {to} to transfer token #{tokenId}",
+      "intent": "Approve {_0} to transfer token #{_1}",
       "params": {
-        "to": {
+        "_0": {
           "label": "operator",
           "type": "address"
         },
-        "tokenId": {
+        "_1": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -106,15 +88,15 @@
       "title": "Revoke Approval",
       "description": "Revoke a per-token approval by setting the operator to the zero address.",
       "group": "erc721",
-      "intent": "Revoke approval for token #{tokenId}",
+      "intent": "Revoke approval for token #{_1}",
       "params": {
-        "to": {
+        "_0": {
           "label": "operator",
           "type": "address",
           "autofill": "zero-address",
           "hidden": true
         },
-        "tokenId": {
+        "_1": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -130,7 +112,7 @@
       "stateMutability": "view",
       "group": "erc721",
       "params": {
-        "tokenId": {
+        "_0": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -148,12 +130,13 @@
       "group": "erc721",
       "warning": "Grants full control over all your tokens in this collection to this operator.",
       "params": {
-        "operator": {
+        "_0": {
           "label": "operator",
           "type": "address"
         },
-        "approved": {
-          "label": "approved"
+        "_1": {
+          "label": "approved",
+          "type": "boolean"
         }
       },
       "related": [
@@ -167,14 +150,14 @@
       "title": "Grant Operator Approval",
       "description": "Give an operator permission to manage every token you own in this collection.",
       "group": "erc721",
-      "intent": "Grant {operator} operator approval for all tokens",
+      "intent": "Grant {_0} operator approval for all tokens",
       "warning": "This operator will be able to transfer any of your tokens at any time.",
       "params": {
-        "operator": {
+        "_0": {
           "label": "operator",
           "type": "address"
         },
-        "approved": {
+        "_1": {
           "label": "approved",
           "autofill": {
             "type": "constant",
@@ -194,13 +177,13 @@
       "title": "Revoke Operator Approval",
       "description": "Revoke an operator's permission to manage your tokens in this collection.",
       "group": "erc721",
-      "intent": "Revoke {operator}'s operator approval",
+      "intent": "Revoke {_0}'s operator approval",
       "params": {
-        "operator": {
+        "_0": {
           "label": "operator",
           "type": "address"
         },
-        "approved": {
+        "_1": {
           "label": "approved",
           "autofill": {
             "type": "constant",
@@ -221,13 +204,19 @@
       "stateMutability": "view",
       "group": "erc721",
       "params": {
-        "owner": {
+        "_0": {
           "label": "owner",
           "type": "address"
         },
-        "operator": {
+        "_1": {
           "label": "operator",
           "type": "address"
+        }
+      },
+      "returns": {
+        "_0": {
+          "label": "approved",
+          "type": "boolean"
         }
       }
     },
@@ -235,17 +224,17 @@
       "title": "Transfer",
       "description": "Transfer a token to another address.",
       "group": "erc721",
-      "intent": "Transfer token #{tokenId} from {from} to {to}",
+      "intent": "Transfer token #{_2} from {_0} to {_1}",
       "params": {
-        "from": {
+        "_0": {
           "label": "from",
           "type": "address"
         },
-        "to": {
+        "_1": {
           "label": "to",
           "type": "address"
         },
-        "tokenId": {
+        "_2": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -256,17 +245,17 @@
       "title": "Safe Transfer",
       "description": "Transfer a token to another address, reverting if the recipient cannot receive ERC-721 tokens.",
       "group": "erc721",
-      "intent": "Transfer token #{tokenId} from {from} to {to}",
+      "intent": "Transfer token #{_2} from {_0} to {_1}",
       "params": {
-        "from": {
+        "_0": {
           "label": "from",
           "type": "address"
         },
-        "to": {
+        "_1": {
           "label": "to",
           "type": "address"
         },
-        "tokenId": {
+        "_2": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -278,21 +267,21 @@
       "title": "Safe Transfer (with Data)",
       "description": "Safe transfer that also forwards extra data to the recipient's onERC721Received hook.",
       "group": "erc721",
-      "intent": "Transfer token #{tokenId} from {from} to {to}",
+      "intent": "Transfer token #{_2} from {_0} to {_1}",
       "params": {
-        "from": {
+        "_0": {
           "label": "from",
           "type": "address"
         },
-        "to": {
+        "_1": {
           "label": "to",
           "type": "address"
         },
-        "tokenId": {
+        "_2": {
           "label": "token ID",
           "type": "token-id"
         },
-        "data": {
+        "_3": {
           "label": "data",
           "description": "Extra bytes passed through to the recipient contract."
         }
@@ -304,13 +293,13 @@
     "Transfer": {
       "description": "Emitted when a token is transferred.",
       "params": {
-        "from": {
+        "_0": {
           "label": "from"
         },
-        "to": {
+        "_1": {
           "label": "to"
         },
-        "tokenId": {
+        "_2": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -319,13 +308,13 @@
     "Approval": {
       "description": "Emitted when an approval is set for a specific token.",
       "params": {
-        "owner": {
+        "_0": {
           "label": "owner"
         },
-        "approved": {
+        "_1": {
           "label": "approved operator"
         },
-        "tokenId": {
+        "_2": {
           "label": "token ID",
           "type": "token-id"
         }
@@ -334,13 +323,13 @@
     "ApprovalForAll": {
       "description": "Emitted when an operator is approved or revoked for all tokens.",
       "params": {
-        "owner": {
+        "_0": {
           "label": "owner"
         },
-        "operator": {
+        "_1": {
           "label": "operator"
         },
-        "approved": {
+        "_2": {
           "label": "approved"
         }
       }

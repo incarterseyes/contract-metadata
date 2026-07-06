@@ -1,16 +1,37 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/1001-digital/contract-metadata/schema/interface.schema.json",
+  "$id": "https://evmnow.github.io/contract-metadata/v1/interface.schema.json",
   "title": "Contract Metadata Interface",
   "description": "Reusable metadata for standard interfaces (ERC-20, ERC-721, etc.). Provides groups, actions, events, and messages that can be included by contract metadata files via the includes field.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI pointing to the interface JSON Schema that this document conforms to."
+    },
+    "interfaceId": {
+      "type": "string",
+      "pattern": "^0x[0-9a-f]{8}$",
+      "description": "The ERC-165 interface identifier (4 bytes, lowercase hex). Consumers MAY use it to auto-detect that a contract implements this interface via supportsInterface()."
+    },
+    "includes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(interface:[a-z0-9-]+|https://.+)$"
+      },
+      "description": "Interface identifiers or https URLs to include. Included metadata is merged with this file's metadata taking priority. Consumers MUST detect and reject include cycles."
+    },
     "groups": {
       "type": "object",
       "description": "Named groups for organizing actions in the UI.",
+      "propertyNames": {
+        "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]*$"
+      },
       "additionalProperties": {
-        "$ref": "contract-metadata.schema.json#/$defs/Group"
+        "$ref": "schema.json#/$defs/Group"
       }
     },
     "actions": {
@@ -20,29 +41,34 @@
         "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]*$"
       },
       "additionalProperties": {
-        "$ref": "contract-metadata.schema.json#/$defs/ActionMeta"
+        "$ref": "schema.json#/$defs/ActionMeta"
       }
     },
     "events": {
       "type": "object",
       "description": "Per-event metadata. Keys can be a bare ABI name, a full signature for overloads, or a 32-byte topic hash for unverified contracts.",
       "additionalProperties": {
-        "$ref": "contract-metadata.schema.json#/$defs/EventMeta"
+        "$ref": "schema.json#/$defs/EventMeta"
       }
     },
     "errors": {
       "type": "object",
       "description": "Per-error metadata. Keys can be a bare ABI name, a full signature for overloads, or a 4-byte selector for unverified contracts.",
       "additionalProperties": {
-        "$ref": "contract-metadata.schema.json#/$defs/ErrorMeta"
+        "$ref": "schema.json#/$defs/ErrorMeta"
       }
     },
     "messages": {
       "type": "object",
       "description": "EIP-712 typed message metadata, keyed by primary type name.",
       "additionalProperties": {
-        "$ref": "contract-metadata.schema.json#/$defs/MessageMeta"
+        "$ref": "schema.json#/$defs/MessageMeta"
       }
+    }
+  },
+  "patternProperties": {
+    "^_[a-zA-Z]": {
+      "description": "Extension object. Names must start with _ followed by a letter. Consumers that do not understand a given extension must ignore it."
     }
   }
 }

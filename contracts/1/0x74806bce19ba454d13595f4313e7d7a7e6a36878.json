@@ -1,5 +1,5 @@
 {
-  "$schema": "https://1001-digital.github.io/contract-metadata/v1/schema.json",
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/schema.json",
   "chainId": 1,
   "address": "0x74806bce19ba454d13595f4313e7d7a7e6a36878",
   "meta": {
@@ -7,7 +7,7 @@
     "lastUpdated": "2026-06-20T00:00:00Z",
     "locale": "en"
   },
-  "name": "Hello World Computer",
+  "name": "Hello World Computer: Artifact",
   "symbol": "HWC",
   "description": "The one-of-one onchain artwork of the Hello World Computer: a WebGL particle field driven by its yes/no tallies.",
   "about": "## The computer's one-of-one artwork\n\nThis is the single, unique artwork tied to the Hello World Computer. There is exactly one — no editions, no copies. The piece is generated entirely onchain: calling `artpiece()` returns a complete HTML and WebGL2 document that renders a living particle field. The artwork reads the computer's current yes and no answer tallies and uses them to size its two particle states, so the image evolves as the computer learns.\n\n## Owning and trading it\n\nOwnership uses a minimal, self-contained marketplace in the spirit of CryptoPunks rather than a standard ERC-721. The current owner can list it for sale at a fixed ETH price — open to anyone, or reserved for one specific address — and can cancel a listing or hand the piece directly to someone with `transferOwnership`. A buyer takes it by calling `buyNow()` with exactly the asking price. The full sale price goes to the seller, who collects it with `withdraw()`.\n\n## Not a standard NFT\n\nBecause ownership is tracked by this contract's own logic, the artwork may not appear or move like a normal token in wallets and marketplaces that expect ERC-721. It exposes `name()` (\"Hello World Computer\") and `symbol()` (\"HWC\") for display, and `owner()` for the current holder.",

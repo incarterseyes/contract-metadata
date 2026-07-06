@@ -1,0 +1,194 @@
+{
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/schema.json",
+  "chainId": 1,
+  "address": "0x0000000000000000000000000000000000000001",
+  "includes": ["interface:erc20"],
+  "meta": {
+    "version": 1,
+    "lastUpdated": "2026-07-01T00:00:00Z",
+    "locale": "en"
+  },
+  "name": "Example Vault",
+  "symbol": "exVLT",
+  "description": "A fictional yield vault used to demonstrate every field of the contract-metadata format. Not a real contract.",
+  "image": "https://vault.example/assets/logo.png",
+  "banner_image": "https://vault.example/assets/banner.png",
+  "featured_image": "https://vault.example/assets/featured.png",
+  "external_link": "https://vault.example",
+  "collaborators": [
+    "0x0000000000000000000000000000000000000002",
+    "0x0000000000000000000000000000000000000003"
+  ],
+  "about": "## A fictional vault\n\nExample Vault is **not a real contract**. It exists only to exercise every part of the contract-metadata schema in one document: ERC-7572 profile fields, audits, collaborators, validation rules, transaction value metadata, and extensions.\n\nDepositors send ETH and receive exVLT shares; shares can be redeemed at any time. All numbers, addresses, and organizations in this file are invented.",
+  "category": "defi",
+  "tags": ["example", "fictional", "vault", "documentation"],
+  "links": [
+    { "label": "Website", "url": "https://vault.example" },
+    { "label": "Documentation", "url": "https://docs.vault.example" }
+  ],
+  "risks": [
+    "This document describes a fictional contract — the address is a placeholder and holds no code",
+    "Illustrative only: do not send funds to the example address"
+  ],
+  "audits": [
+    {
+      "auditor": "Fictional Audit Collective",
+      "url": "https://audits.example/reports/example-vault-2026.pdf",
+      "date": "2026-01-15",
+      "scope": "Core vault accounting and the exVLT share token"
+    },
+    {
+      "auditor": "Make-Believe Security",
+      "url": "https://security.example/example-vault",
+      "date": "2026-03-02"
+    }
+  ],
+  "theme": {
+    "background": "#0b0e14",
+    "text": "#e6e1cf",
+    "accent": "#ffb454",
+    "accentText": "#0b0e14",
+    "border": "#1f2430"
+  },
+  "groups": {
+    "vault": { "label": "Vault", "order": 1 },
+    "strategy": { "label": "Strategy" }
+  },
+  "actions": {
+    "deposit": {
+      "title": "Deposit ETH",
+      "description": "Deposit ETH into the vault and receive exVLT shares at the current share price.",
+      "intent": "Deposit {value} into the vault",
+      "group": "vault",
+      "order": 0,
+      "featured": true,
+      "value": {
+        "label": "deposit amount",
+        "description": "ETH to deposit. The fictional vault enforces a 0.01 ETH minimum.",
+        "validation": {
+          "min": "10000000000000000",
+          "message": "Deposits below 0.01 ETH are rejected by the vault."
+        }
+      },
+      "related": ["redeem", "my-balance"]
+    },
+    "redeem": {
+      "title": "Redeem Shares",
+      "description": "Burn exVLT shares and withdraw the corresponding amount of ETH.",
+      "intent": "Redeem {shares} shares",
+      "group": "vault",
+      "order": 1,
+      "params": {
+        "shares": {
+          "label": "shares",
+          "type": "token-amount",
+          "validation": {
+            "min": "1",
+            "max": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "message": "You must redeem at least one share."
+          }
+        }
+      },
+      "related": ["deposit", "my-balance"]
+    },
+    "setStrategy": {
+      "title": "Set Strategy",
+      "description": "Point the vault at a new yield strategy. Owner only.",
+      "group": "strategy",
+      "warning": "Owner only. A malicious strategy can steal all vault funds.",
+      "params": {
+        "id": {
+          "label": "strategy",
+          "type": {
+            "type": "enum",
+            "values": {
+              "0": "Idle (no yield)",
+              "1": "Fictional Lending Desk",
+              "2": "Imaginary LP Farm"
+            }
+          },
+          "validation": {
+            "enum": [
+              { "value": "0", "label": "Idle (no yield)" },
+              { "value": "1", "label": "Fictional Lending Desk" },
+              { "value": "2", "label": "Imaginary LP Farm" }
+            ],
+            "message": "Unknown strategy id."
+          }
+        },
+        "memo": {
+          "label": "memo",
+          "description": "Short operator note recorded with the strategy change.",
+          "validation": {
+            "pattern": "^[a-zA-Z0-9 .,-]{0,64}$",
+            "message": "Memo may only contain letters, numbers, spaces, and basic punctuation."
+          },
+          "_component": "memo-editor"
+        }
+      }
+    },
+    "sharePrice": {
+      "title": "Share Price",
+      "description": "The current ETH value of one exVLT share, as an 18-decimal fixed-point number.",
+      "stateMutability": "view",
+      "group": "vault",
+      "returns": {
+        "_0": {
+          "label": "share price",
+          "type": { "type": "amount", "decimals": 18, "symbol": "ETH" }
+        }
+      },
+      "_component": {
+        "type": "sparkline-chart",
+        "props": {
+          "series": "sharePrice",
+          "window": "30d"
+        }
+      },
+      "examples": [
+        { "label": "Current share price", "params": {} }
+      ]
+    },
+    "donate": {
+      "function": "deposit",
+      "title": "Donate to the Vault",
+      "description": "Deposit a fixed 0.05 ETH on behalf of the fictional community fund.",
+      "group": "vault",
+      "order": 2,
+      "value": {
+        "label": "donation",
+        "autofill": { "type": "constant", "value": "50000000000000000" },
+        "disabled": true
+      },
+      "related": ["deposit"]
+    }
+  },
+  "events": {
+    "Deposited": {
+      "description": "Emitted when ETH is deposited and shares are minted.",
+      "params": {
+        "account": { "label": "depositor", "type": "address" },
+        "assets": { "label": "ETH deposited", "type": "eth" },
+        "shares": { "label": "shares minted", "type": "token-amount" }
+      }
+    },
+    "Redeemed": {
+      "description": "Emitted when shares are burned and ETH is withdrawn.",
+      "params": {
+        "account": { "label": "redeemer", "type": "address" },
+        "shares": { "label": "shares burned", "type": "token-amount" },
+        "assets": { "label": "ETH withdrawn", "type": "eth" }
+      }
+    }
+  },
+  "errors": {
+    "DepositTooSmall": {
+      "title": "Deposit Too Small",
+      "description": "Deposits must be at least 0.01 ETH."
+    }
+  },
+  "_examplecorp": {
+    "note": "Fictional root-level extension demonstrating the ^_[a-zA-Z] escape hatch.",
+    "docs": "https://docs.vault.example/metadata-extension"
+  }
+}

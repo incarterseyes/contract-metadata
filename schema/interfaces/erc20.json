@@ -1,4 +1,6 @@
 {
+  "$schema": "https://evmnow.github.io/contract-metadata/v1/interface.schema.json",
+  "interfaceId": "0x36372b07",
   "groups": {
     "erc20": {
       "label": "ERC-20",
