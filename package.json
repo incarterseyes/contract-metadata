@@ -6,6 +6,7 @@
   "license": "CC0-1.0",
   "description": "Human-readable context for smart contracts.",
   "scripts": {
+    "build:pages": "node scripts/build-pages.mjs",
     "validate": "tsx validate.ts",
     "validate:contracts": "tsx validate.ts --contracts",
     "validate:interfaces": "tsx validate.ts --interfaces",

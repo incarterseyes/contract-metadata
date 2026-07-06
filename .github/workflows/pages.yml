@@ -31,13 +31,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Assemble site
-        run: |
-          mkdir -p _site/v1/interfaces _site/v1/extensions
-          cp schema/contract-metadata.schema.json _site/v1/schema.json
-          cp schema/interface.schema.json _site/v1/interface.schema.json
-          cp schema/interfaces/*.json _site/v1/interfaces/
-          cp extensions/*.schema.json _site/v1/extensions/
-          cp -r contracts _site/contracts
+        run: node scripts/build-pages.mjs
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
