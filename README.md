@@ -46,7 +46,67 @@ offerPunkForSaleToAddress(uint256, uint256, address)
 }
 ```
 
-Actions decouple the user-facing UX surface from the ABI. One ABI function can back multiple actions (variants). For example, a single `approve` function can surface as `approve` (normal), `approve-max` (unlimited, amount locked), and `revoke` (amount locked to 0) — each with its own title, intent, and warning.
+Actions decouple the user-facing UX surface from the ABI. The clearest example is ERC-20 approvals: the contract exposes one function, but users think in several distinct actions.
+
+```
+approve(address,uint256)
+```
+
+Contract Metadata can present that single ABI function as three separate actions:
+
+```json
+{
+  "actions": {
+    "approve": {
+      "title": "Approve",
+      "description": "Approve a spender to transfer up to the given amount of your tokens.",
+      "intent": "Approve {_0} to spend {_1}",
+      "warning": "Approving unlimited amounts is common but carries risk if the spender contract is compromised.",
+      "params": {
+        "_0": { "label": "spender", "type": "address" },
+        "_1": { "label": "amount", "type": "token-amount" }
+      },
+      "related": ["approve-max", "revoke", "allowance"]
+    },
+    "approve-max": {
+      "function": "approve",
+      "title": "Approve Unlimited",
+      "description": "Grant unlimited approval to a spender.",
+      "intent": "Approve {_0} to spend unlimited tokens",
+      "warning": "Unlimited approvals let the spender transfer any amount of your tokens at any time.",
+      "params": {
+        "_0": { "label": "spender", "type": "address" },
+        "_1": {
+          "label": "amount",
+          "autofill": {
+            "type": "constant",
+            "value": "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+          },
+          "hidden": true
+        }
+      },
+      "related": ["approve", "revoke", "allowance"]
+    },
+    "revoke": {
+      "function": "approve",
+      "title": "Revoke Approval",
+      "description": "Revoke a spender's token approval by setting the allowance to zero.",
+      "intent": "Revoke approval for {_0}",
+      "params": {
+        "_0": { "label": "spender", "type": "address" },
+        "_1": {
+          "label": "amount",
+          "autofill": { "type": "constant", "value": "0" },
+          "hidden": true
+        }
+      },
+      "related": ["approve", "approve-max", "allowance"]
+    }
+  }
+}
+```
+
+`approve-max` and `revoke` still call `approve(address,uint256)`. Their `function` fields point back to the ABI function, while hidden autofilled parameters lock the amount to either `uint256.max` or `0`. Wallets and explorers can therefore render user intents directly without pretending those intents are separate contract functions.
 
 ## Repository Structure
 
