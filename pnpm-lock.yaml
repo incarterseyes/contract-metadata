@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@evmnow/sdk':
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.7.0
+        version: 0.7.0
       '@types/node':
         specifier: ^25.5.0
         version: 25.9.4
@@ -191,8 +191,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@evmnow/sdk@0.6.0':
-    resolution: {integrity: sha512-WH1eyahksiDs8xR1lDBpLlQb1X1VZqKmSrZd6dS5qQpUt9yh/gZfaSCS+o0k0xt24zWEz5Cx53EsGwuROyq+MA==}
+  '@evmnow/sdk@0.7.0':
+    resolution: {integrity: sha512-QPKZm1p81LPwJKT7nWw9qtNS+ZxX/H9OUhm70xPT7WMWPn5aCN6sML3+PQ8A9oHtMMUN9DpVZY9N0Ny21PKhkg==}
+    engines: {node: '>=18'}
 
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
@@ -334,7 +335,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
-  '@evmnow/sdk@0.6.0':
+  '@evmnow/sdk@0.7.0':
     dependencies:
       '@1001-digital/natspec': 0.1.0
       '@1001-digital/proxies': 0.2.0
