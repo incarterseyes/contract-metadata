@@ -46,6 +46,8 @@ offerPunkForSaleToAddress(uint256, uint256, address)
 }
 ```
 
+Note: `params` keys can be ABI parameter names (`punkIndex`) or positional keys (`_0`). Contract-specific files can use names when the ABI provides them, as this CryptoPunks example does. Interface files and reusable examples should use positional keys because implementations can rename parameters. See [Parameter Keys](./eip-draft.md#parameter-keys).
+
 Actions decouple the user-facing UX surface from the ABI. The clearest example is ERC-20 approvals: the contract exposes one function, but users think in several distinct actions.
 
 ```
