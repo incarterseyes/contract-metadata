@@ -91,7 +91,7 @@
       "order": 5,
       "title": "Token's Project",
       "description": "Returns the ID of the project a given token belongs to.",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "collection",
       "params": {
         "_0": { "label": "token ID", "type": "token-id" }
@@ -121,7 +121,7 @@
       "params": {
         "_0": { "label": "recipient", "type": "address" },
         "_1": { "label": "project ID" },
-        "_2": { "label": "minter caller", "type": "address" }
+        "_2": { "label": "purchaser", "type": "address" }
       },
       "returns": {
         "_0": { "label": "token ID", "type": "token-id" }
@@ -301,14 +301,14 @@
       "order": 0,
       "title": "Core Type",
       "description": "The Art Blocks core contract type identifier for this contract.",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "info"
     },
     "coreVersion": {
       "order": 1,
       "title": "Core Version",
       "description": "The Art Blocks core contract version string.",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "info"
     },
     "randomizerContract": {
