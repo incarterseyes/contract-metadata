@@ -69,10 +69,11 @@
       }
     },
     "getPrice": {
-      "title": "Current Price",
-      "description": "The current mint price under the declining Dutch-auction schedule.",
+      "title": "Former Mint Price",
+      "description": "The former Dutch-auction price getter; elapsed-time arithmetic now underflows and the call reverts.",
       "stateMutability": "view",
       "group": "info",
+      "deprecated": "The auction is long over; elapsed-time arithmetic underflows, so this call now reverts.",
       "returns": {
         "_0": {
           "label": "price",
