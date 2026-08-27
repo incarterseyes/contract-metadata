@@ -11,7 +11,7 @@
   "name": "Slonks",
   "symbol": "SLONKS",
   "description": "A 10,000-piece ERC-721 collection of CryptoPunks reconstructed on-chain by a neural model and rendered live.",
-  "about": "## About Slonks\n\nSlonks are on-chain neural reconstructions of CryptoPunks. A compact image model, trained on the full CryptoPunks set and stored on-chain, regenerates each 24x24 image directly from the contract — no image files are uploaded. The pixels where the model disagrees with the original punk are the artwork; that divergence is measured as a token's \"slop\" (0 to 576, the pixel count of the canvas). \"Slop is the art.\"\n\n## System of contracts\n\nThis contract is a SeaDrop-compatible ERC-721A shell holding ownership, minting, transfer, and the reveal that maps each token to its CryptoPunks source id. It delegates all metadata and imagery to an updatable renderer:\n\n- **SlonksRenderer** (`0x726383bd28fa1f95a7e3d300babf08f6444d0437`) assembles `tokenURI`, imagery, and attributes.\n- **SlonksImageModel** (`0xca116243a2013ed33015c776ee37310b199ee80c`) is the on-chain neural network.\n- **SlonksPixelCanvas** (`0x690d67bb6042c778c06ec9ba182a3032247893d4`) is an optional paint layer.\n- **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`) runs the void / $SLOP game and merges, and is an authorized metadata updater on this contract.\n- **SlonksMergeManager** (`0x7bda4820dbcfe471a2e23d3fa069c1cd261401e1`) records merges.\n\nMax supply is permanently fixed at 10,000; `setMaxSupply` reverts for any other value. Minting starts at token id 0. Live minted and burned counts change over time.\n\n## Reveal\n\nThe mapping from each token to its final CryptoPunks source id is fixed by a one-time reveal: the owner commits to a future block, then anyone may finalize using that block's hash. The committed block hash must be finalized within a 256-block window or the commit must be redone.",
+  "about": "## About Slonks\n\nSlonks are on-chain neural reconstructions of CryptoPunks. A compact image model, trained on the full CryptoPunks set and stored on-chain, regenerates each 24x24 image directly from the contract — no image files are uploaded. The pixels where the model disagrees with the original punk are the artwork; that divergence is measured as a token's \"slop\" (0 to 576, the pixel count of the canvas). \"Slop is the art.\"\n\n## System of contracts\n\nThis contract is a SeaDrop-compatible ERC-721A shell holding ownership, minting, transfer, and the reveal that maps each token to its CryptoPunks source id. It delegates all metadata and imagery to an updatable renderer:\n\n- **SlonksRenderer** (`0x726383bd28fa1f95a7e3d300babf08f6444d0437`) assembles `tokenURI`, imagery, and attributes.\n- **SlonksImageModel** (`0xca116243a2013ed33015c776ee37310b199ee80c`) is the on-chain neural network.\n- **SlonksPixelCanvas** (`0x690d67bb6042c778c06ec9ba182a3032247893d4`) is an optional paint layer.\n- **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`) runs the void / $SLOP game and active embedding state, and is an authorized metadata updater on this contract.\n- **SlonksMergeManager** (`0x7bda4820dbcfe471a2e23d3fa069c1cd261401e1`) records merges.\n\nMax supply is permanently fixed at 10,000; `setMaxSupply` reverts for any other value. Minting starts at token id 0. Live minted and burned counts change over time.\n\n## Reveal\n\nThe one-time reveal has been finalized. Its seed permanently fixes the mapping from each token to its CryptoPunks source id; the reveal cannot be committed or finalized again.",
   "category": "nft",
   "tags": ["art", "onchain", "neural", "ai", "cryptopunks", "pixel-art", "generative", "seadrop", "erc721a"],
   "links": [
@@ -24,7 +24,6 @@
   ],
   "risks": [
     "Swappable renderer — the owner can change the renderer, altering all displayed art and metadata",
-    "Blockhash-based reveal must be finalized within a 256-block window or the commit must be redone",
     "The owner can authorize arbitrary metadata-updater contracts that trigger ERC-4906 refreshes",
     "Minting and drop configuration route through an external OpenSea SeaDrop contract and owner-set parameters"
   ],
@@ -122,16 +121,19 @@
     },
     "commitReveal": {
       "title": "Commit Reveal",
-      "description": "Commit to a future block whose hash will seed the one-time reveal. Only the owner can call this.",
+      "description": "The one-time reveal is already finalized, so this call reverts.",
       "group": "reveal",
+      "hidden": true,
+      "deprecated": "Unavailable: the collection has already been revealed.",
       "returns": { "_0": { "label": "target block", "type": "blocknumber" } },
       "related": ["finalizeReveal", "revealed"]
     },
     "finalizeReveal": {
       "title": "Finalize Reveal",
-      "description": "Finalize the reveal using the committed block hash; callable by anyone within the 256-block window.",
+      "description": "The one-time reveal is already finalized, so this call reverts.",
       "group": "reveal",
-      "warning": "Must be called within 256 blocks of the committed block or the commitment expires and must be redone.",
+      "hidden": true,
+      "deprecated": "Unavailable: the collection has already been revealed.",
       "related": ["commitReveal", "revealed"]
     },
     "burn": {
