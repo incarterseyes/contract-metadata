@@ -211,13 +211,13 @@
     },
     "proposeArtistPaymentAddressesAndSplits": {
       "order": 6,
-      "title": "Update Payment Splits",
-      "description": "Updates artist and additional-payee payout addresses and splits; this clone automatically accepts every proposal.",
+      "title": "Update Artist and Payment Splits",
+      "description": "Updates the controlling artist address and payment splits; this clone applies every change immediately.",
       "group": "artist",
-      "warning": "Changes take effect immediately without a separate AdminACL acceptance.",
+      "warning": "Changing the artist address immediately transfers every artist-only permission to the new address and removes the caller's artist access.",
       "params": {
         "_0": { "label": "project ID" },
-        "_1": { "label": "artist address", "type": "address" },
+        "_1": { "label": "artist and controller", "type": "address" },
         "_2": { "label": "additional payee (primary)", "type": "address" },
         "_3": { "label": "additional payee % (primary)", "type": "percentage" },
         "_4": { "label": "additional payee (secondary)", "type": "address" },
