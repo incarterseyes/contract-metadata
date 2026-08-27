@@ -4,7 +4,7 @@
   "address": "0x726383bd28fa1f95a7e3d300babf08f6444d0437",
   "meta": {
     "version": 1,
-    "lastUpdated": "2026-08-21T00:00:00Z",
+    "lastUpdated": "2026-08-27T00:00:00Z",
     "locale": "en"
   },
   "name": "Slonks Renderer",
@@ -47,13 +47,13 @@
       "group": "render",
       "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } }
     },
-    "renderDiff": {
-      "title": "Render Diff",
-      "description": "Return the diff view highlighting pixels where the model disagrees with the original.",
+    "renderSlop": {
+      "title": "Render Slop",
+      "description": "Return the slop-mask view highlighting pixels where the current Slonk differs from its original punk.",
       "stateMutability": "view",
       "group": "render",
       "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } },
-      "related": ["diffPixelCount"]
+      "related": ["slop"]
     },
     "renderPreReveal": {
       "title": "Render Pre-Reveal",
@@ -62,13 +62,13 @@
       "group": "render",
       "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } }
     },
-    "diffPixelCount": {
-      "title": "Diff Pixel Count",
-      "description": "The number of pixels that differ from the original punk (the token's slop, 0 to 576).",
+    "slop": {
+      "title": "Slop Pixel Count",
+      "description": "Return the number of pixels in the current Slonk that differ from the original punk (0 to 576).",
       "stateMutability": "view",
       "group": "render",
       "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } },
-      "related": ["renderDiff"]
+      "related": ["renderSlop"]
     },
     "attributesJSON": {
       "title": "Attributes (JSON)",
