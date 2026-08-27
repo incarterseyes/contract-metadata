@@ -71,6 +71,7 @@
       "related": ["renderSlop"]
     },
     "attributesJSON": {
+      "function": "attributesJSON(uint256)",
       "title": "Attributes (JSON)",
       "description": "Return the token's on-chain attributes as a JSON array.",
       "stateMutability": "view",
