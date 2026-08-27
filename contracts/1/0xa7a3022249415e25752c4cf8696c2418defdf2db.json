@@ -13,9 +13,7 @@
   "about": "## About\n\nArtificial After All (2026) is the factory contract by Han that created the Artificial series. Each mint deployed a new, fully independent `Artificial` contract — one of 256 sovereign pieces, each holding a compressed neural network, an inference engine, and its own built-in marketplace onchain (see 0xbdf5a7f5e5ae18ee580139297c63a89fc1d18b5f for one piece).\n\n## Minting\n\nThe 256-piece edition is sold out, so `createArtificial()` now reverts with `SoldOut`. The first 64 pieces were reserved for the artist and minted for free; the remaining pieces minted for a fixed 0.128 ETH each. On each mint the factory derived a seed from the block randomness, the minter, and the count, deployed a new `Artificial` contract owned by the minter, and recorded it in the `isArtificial` registry. Collected mint proceeds can be swept by the artist via `collect()`.",
   "risks": [
     "No upgradeability — contract logic is permanent and cannot be patched",
-    "The artist alone can call collect(), which sweeps the entire ETH balance to the artist",
-    "The first 64 pieces mint for free and are reserved for the artist",
-    "Mint seed derives from block.prevrandao, which validators can influence to a limited degree"
+    "The artist alone can call collect(), which sweeps the entire ETH balance to the artist"
   ],
   "category": "nft",
   "tags": ["art", "generative", "onchain", "neural-network", "ai", "factory"],
@@ -60,14 +58,14 @@
     },
     "thisMuch": {
       "title": "Mint Price",
-      "description": "The fixed price to mint a piece once the artist reserve is exhausted.",
+      "description": "The historical fixed mint price charged after the artist reserve was exhausted.",
       "stateMutability": "view",
       "group": "collection",
       "returns": { "_0": { "label": "price", "type": "eth" } }
     },
     "thisForArtist": {
       "title": "Artist Reserve",
-      "description": "The number of pieces reserved for the artist to mint for free (64).",
+      "description": "The number of pieces originally reserved for the artist to mint for free (64).",
       "stateMutability": "view",
       "group": "collection",
       "returns": { "_0": { "label": "reserved" } }
