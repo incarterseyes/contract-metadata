@@ -132,7 +132,7 @@
     },
     "inputUpdateCount": {
       "title": "Input Update Count",
-      "description": "How many times the input contracts have been updated.",
+      "description": "How many distinct blocks contain a stored input snapshot.",
       "stateMutability": "view",
       "group": "oracle",
       "returns": { "_0": { "label": "count" } },
@@ -140,7 +140,7 @@
     },
     "moodUpdateCount": {
       "title": "Mood Update Count",
-      "description": "How many times the mood has been updated.",
+      "description": "How many distinct blocks contain a stored mood snapshot.",
       "stateMutability": "view",
       "group": "oracle",
       "returns": { "_0": { "label": "count" } },
