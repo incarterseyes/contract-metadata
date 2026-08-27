@@ -108,8 +108,16 @@
       "description": "List the artwork for sale at a fixed price, open to anyone. Only the owner can call this.",
       "intent": "List Artificial for sale at {salePriceInWei}",
       "group": "marketplace",
+      "warning": "Owner only. A zero-price listing lets anyone take the artwork for free; use at least 1 wei.",
       "params": {
-        "salePriceInWei": { "label": "price", "type": "eth" }
+        "salePriceInWei": {
+          "label": "price",
+          "type": "eth",
+          "validation": {
+            "min": "1",
+            "message": "Price must be at least 1 wei; zero would let anyone take the artwork for free."
+          }
+        }
       },
       "related": ["cancelFromSale", "buyNow"]
     },
