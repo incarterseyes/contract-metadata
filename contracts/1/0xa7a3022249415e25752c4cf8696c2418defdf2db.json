@@ -4,13 +4,13 @@
   "address": "0xa7a3022249415e25752c4cf8696c2418defdf2db",
   "meta": {
     "version": 1,
-    "lastUpdated": "2026-08-21T00:00:00Z",
+    "lastUpdated": "2026-08-27T00:00:00Z",
     "locale": "en"
   },
   "name": "Artificial After All",
   "symbol": "AAA",
-  "description": "The factory that mints the 256 Artificial pieces, each a sovereign onchain generative artwork contract.",
-  "about": "## About\n\nArtificial After All (2026) is the factory contract by Han that mints the Artificial series. Each mint deploys a new, fully independent `Artificial` contract — one of 256 sovereign pieces, each holding a compressed neural network, an inference engine, and its own built-in marketplace onchain (see 0xbdf5a7f5e5ae18ee580139297c63a89fc1d18b5f for one piece).\n\n## Minting\n\nThe edition is capped at 256. The first 64 are reserved for the artist and mint for free; the remaining pieces mint for a fixed 0.128 ETH each. On each mint the factory derives a seed from the block randomness, the minter, and the count, deploys a new `Artificial` contract owned by the minter, and records it in the `isArtificial` registry. Collected mint proceeds can be swept by the artist via `collect()`.",
+  "description": "The sold-out factory that created 256 Artificial pieces, each a sovereign onchain generative artwork contract.",
+  "about": "## About\n\nArtificial After All (2026) is the factory contract by Han that created the Artificial series. Each mint deployed a new, fully independent `Artificial` contract — one of 256 sovereign pieces, each holding a compressed neural network, an inference engine, and its own built-in marketplace onchain (see 0xbdf5a7f5e5ae18ee580139297c63a89fc1d18b5f for one piece).\n\n## Minting\n\nThe 256-piece edition is sold out, so `createArtificial()` now reverts with `SoldOut`. The first 64 pieces were reserved for the artist and minted for free; the remaining pieces minted for a fixed 0.128 ETH each. On each mint the factory derived a seed from the block randomness, the minter, and the count, deployed a new `Artificial` contract owned by the minter, and recorded it in the `isArtificial` registry. Collected mint proceeds can be swept by the artist via `collect()`.",
   "risks": [
     "No upgradeability — contract logic is permanent and cannot be patched",
     "The artist alone can call collect(), which sweeps the entire ETH balance to the artist",
@@ -85,12 +85,12 @@
       }
     },
     "createArtificial": {
-      "title": "Mint Piece",
-      "description": "Mint a new Artificial piece to yourself by sending the exact mint price in ETH.",
+      "title": "Mint Piece (Sold Out)",
+      "description": "Originally minted new Artificial pieces; all 256 now exist, so this function reverts with SoldOut.",
       "intent": "Mint an Artificial piece",
       "group": "mint",
-      "featured": true,
-      "warning": "Sends ETH. The exact mint price must be sent. The artist reserve mints are restricted to the artist.",
+      "warning": "The collection is sold out. This action always reverts with SoldOut.",
+      "deprecated": "All 256 Artificial pieces have been created. This function will revert with SoldOut.",
       "related": ["thisMuch", "thisMany"]
     },
     "artist": {
