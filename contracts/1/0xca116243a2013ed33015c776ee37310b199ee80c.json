@@ -9,7 +9,7 @@
   },
   "name": "Slonks Image Model",
   "description": "The on-chain neural network for Slonks: it regenerates each 24x24 image from stored weights, pixel by pixel.",
-  "about": "## Role in the Slonks system\n\nThis contract holds the weights of a compact image model, trained on the full CryptoPunks set and stored fully on-chain, that reconstructs each Slonk image. It is read by the **SlonksRenderer** (`0x726383bd28fa1f95a7e3d300babf08f6444d0437`) which serves the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`).\n\nModel weights are supplied as pointer contracts and can be replaced by the owner until `lockModel` is called, after which the model is permanent.",
+  "about": "## Role in the Slonks system\n\nThis contract holds the weights of a compact image model, trained on the full CryptoPunks set and stored fully on-chain, that reconstructs each Slonk image. It is read by the **SlonksRenderer** (`0x726383bd28fa1f95a7e3d300babf08f6444d0437`) which serves the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`).\n\nThe owner permanently locked this deployment after supplying its weight pointers and configuration. The weights and model configuration can no longer be changed.",
   "category": "utility",
   "tags": ["neural", "onchain", "model", "cryptopunks", "slonks"],
   "links": [
@@ -17,7 +17,7 @@
     { "label": "Website", "url": "https://www.slonks.art/" }
   ],
   "risks": [
-    "Model weights are owner-mutable via setWeightChunks and setConfig until lockModel is called"
+    "The model is permanently locked, so any defect in its weights or configuration cannot be corrected"
   ],
   "groups": {
     "inference": { "label": "Inference", "order": 1 },
@@ -62,24 +62,37 @@
       },
       "returns": { "_0": { "label": "palette index" } }
     },
+    "modelLocked": {
+      "title": "Model Locked",
+      "description": "Whether the model weights and configuration have been permanently frozen.",
+      "stateMutability": "view",
+      "group": "admin",
+      "returns": { "_0": { "label": "locked", "type": "boolean" } },
+      "related": ["setWeightChunks", "setConfig", "lockModel"]
+    },
     "setWeightChunks": {
       "title": "Set Weight Chunks",
-      "description": "Set the pointer contracts holding the model weights. Only the owner can call this before the model is locked.",
+      "description": "Replace the weight pointer contracts. This deployment is already locked, so the call reverts.",
       "group": "admin",
+      "hidden": true,
+      "deprecated": "Unavailable: the model is permanently locked.",
       "params": { "_0": { "label": "weight chunks" } },
       "related": ["lockModel"]
     },
     "setConfig": {
       "title": "Set Config",
-      "description": "Update the model configuration. Only the owner can call this before the model is locked.",
+      "description": "Replace the model configuration. This deployment is already locked, so the call reverts.",
       "group": "admin",
+      "hidden": true,
+      "deprecated": "Unavailable: the model is permanently locked.",
       "related": ["lockModel"]
     },
     "lockModel": {
       "title": "Lock Model",
-      "description": "Permanently freeze the model weights and configuration. Only the owner can call this.",
+      "description": "Permanently freeze the model. This deployment is already locked, so the call reverts.",
       "group": "admin",
-      "warning": "Irreversible: after locking, the model can never be changed again."
+      "hidden": true,
+      "deprecated": "Unavailable: the model is already permanently locked."
     },
     "setMetadataNotifier": {
       "title": "Set Metadata Notifier",
