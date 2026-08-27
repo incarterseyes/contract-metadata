@@ -8,7 +8,6 @@
     "locale": "en"
   },
   "name": "Art Blocks Engine Core (Implementation)",
-  "symbol": "ABSTUDIO",
   "description": "Shared GenArt721CoreV3_Engine logic contract that individual Art Blocks Engine cores clone via EIP-1167.",
   "about": "## About\n\nThis is the shared implementation of the Art Blocks Engine V3 core (`GenArt721CoreV3_Engine`, coreVersion `v3.2.4`). It holds the logic — not the state — for Art Blocks Engine ERC-721 collections.\n\n## How it is used\n\nIndividual Engine collections are deployed as **EIP-1167 minimal proxies (clones)** that delegate all calls to this contract. Each clone keeps its own storage (its name, projects, minter, randomizer, and admin), while the executable logic lives here and is reused across every core that clones it. For example, the collection **Art Blocks Studio | 56** (`0x000000a35301fa5784e820f489003ffcffdc69a6`) is one such clone.\n\nCalling this implementation directly is not meaningful for collectors; interact with a specific collection's clone address instead. The full ERC-721, minting, artist, and admin action set is documented on the clone entries. Minting, randomness, administration, and royalties are handled by separate Art Blocks platform contracts (MinterFilter, randomizer, AdminACL, core registry, split provider, and bytecode-storage reader).",
   "category": "nft",
