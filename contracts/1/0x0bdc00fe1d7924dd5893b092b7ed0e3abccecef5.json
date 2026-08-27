@@ -53,7 +53,7 @@
     },
     "getVariablesAt": {
       "title": "Variables At Block",
-      "description": "Returns historical inputs and mood for a block combined with the current RPC provider defaults and whitepaper configuration.",
+      "description": "Returns historical inputs and mood for a block with the current RPC providers and whitepaper.",
       "stateMutability": "view",
       "group": "render",
       "params": {
