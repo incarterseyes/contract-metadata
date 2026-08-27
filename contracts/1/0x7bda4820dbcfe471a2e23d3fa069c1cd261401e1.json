@@ -8,13 +8,16 @@
     "locale": "en"
   },
   "name": "Slonks Merge Manager",
-  "description": "The live merge manager for Slonks: it burns one Slonk into another, averaging their embeddings so slop only goes up.",
-  "about": "## Role in the Slonks system\n\nThis is the active merge manager for the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`). Merging picks a survivor token and burns a donor of the same merge level; their embeddings are averaged, the result is re-rendered, and the recomputed slop only increases. It is an authorized metadata updater on the NFT and its state is surfaced to renderers through **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`).\n\nThis deployment supersedes an earlier merge manager (`0x3c60eff7b4aff33a3ad5f0b7c9c7d13ba80a422f`), which the current renderer still references as a fallback read but which is no longer the authoritative merge recorder.",
+  "description": "The live merge manager for Slonks: it burns one same-level Slonk into another and averages their embeddings.",
+  "about": "## Role in the Slonks system\n\nThis is the active merge manager for the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`). Merging picks a survivor token and burns a donor of the same merge level; their embeddings are averaged and the result is re-rendered. It is an authorized metadata updater on the NFT. It reads **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`) as an active-state fallback, while SlopGameV2 reads this manager for base merge state.\n\nThis deployment supersedes an earlier merge manager (`0x3c60eff7b4aff33a3ad5f0b7c9c7d13ba80a422f`), which the current renderer still references as a fallback read but which is no longer the authoritative merge recorder.",
   "category": "utility",
   "tags": ["merge", "onchain", "slop", "slonks"],
   "links": [
     { "label": "Etherscan", "url": "https://etherscan.io/address/0x7bda4820dbcfe471a2e23d3fa069c1cd261401e1" },
     { "label": "Website", "url": "https://www.slonks.art/" }
+  ],
+  "risks": [
+    "The Slonks NFT owner can replace the active and legacy state sources, changing fallback merge levels and embeddings"
   ],
   "groups": {
     "merge": { "label": "Merge", "order": 1 },
@@ -24,7 +27,7 @@
   "actions": {
     "merge": {
       "title": "Merge",
-      "description": "Burn a same-level donor Slonk into a survivor, averaging embeddings; slop only goes up.",
+      "description": "Burn a same-level donor Slonk into a survivor and average their model embeddings.",
       "group": "merge",
       "intent": "Merge token #{_1} into token #{_0}",
       "warning": "The donor token is permanently burned. This action cannot be undone.",
@@ -61,7 +64,7 @@
     },
     "activeState": {
       "title": "Active State",
-      "description": "The active-state contract this manager reports to.",
+      "description": "The active-state source used when a token has no locally stored merge state.",
       "stateMutability": "view",
       "group": "read",
       "returns": { "_0": { "type": "address" } },
@@ -69,7 +72,7 @@
     },
     "setActiveState": {
       "title": "Set Active State",
-      "description": "Set the active-state contract merges report to. Only the owner can call this.",
+      "description": "Set the fallback active-state source. Only the Slonks NFT owner can call this.",
       "group": "admin",
       "params": { "_0": { "label": "active state", "type": "address" } },
       "related": ["activeState"]
