@@ -11,7 +11,7 @@
   "name": "SLOP",
   "symbol": "SLOP",
   "description": "The $SLOP ERC-20 token, minted after a valid proof moves a locked Slonk into the void.",
-  "about": "## About $SLOP\n\n$SLOP is the ERC-20 token of the Slonks ecosystem. It has 18 decimals and supports EIP-2612 permit. It is minted by authorized minters — primarily **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`), the void game — after a valid proof moves a holder's locked Slonk into the void, with the amount driven by that token's slop. It relates to the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`).\n\nMinting is capped by a maximum supply, and a one-time launch inventory can be minted once. Authorized minters can also burn balances as part of Slonks game mechanics, so circulating and total supply change over time.",
+  "about": "## About $SLOP\n\n$SLOP is the ERC-20 token of the Slonks ecosystem. It has 18 decimals and supports EIP-2612 permit. It is minted by authorized minters — primarily **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`), the void game — after a valid proof moves a holder's locked Slonk into the void, with the amount driven by that token's slop. It relates to the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`).\n\nMinting is capped by a maximum supply, and the one-time launch inventory has already been minted. Authorized minters can also burn balances as part of Slonks game mechanics, so circulating and total supply change over time.",
   "category": "token",
   "tags": ["token", "erc20", "slop", "slonks"],
   "links": [
@@ -77,8 +77,10 @@
     },
     "mintLaunchInventory": {
       "title": "Mint Launch Inventory",
-      "description": "Mint the one-time launch inventory to an address. Callable once by the owner.",
+      "description": "The one-time launch inventory has already been minted, so this call reverts.",
       "group": "admin",
+      "hidden": true,
+      "deprecated": "Unavailable: the launch inventory was already minted.",
       "params": { "_0": { "label": "recipient", "type": "address" } },
       "related": ["launchInventoryMinted"]
     },
