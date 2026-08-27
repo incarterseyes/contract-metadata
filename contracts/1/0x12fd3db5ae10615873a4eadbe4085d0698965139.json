@@ -10,11 +10,11 @@
   "name": "Automate Attention",
   "symbol": "AATTN",
   "description": "A fully on-chain generative NFT whose art and text are computed live by an on-chain LLM and SVG generator.",
-  "about": "## Automate Attention\n\nAutomate Attention (`AATTN`) is a fully on-chain ERC-721 collection. Nothing about a token is stored as a static file: each `tokenURI` is computed live from other contracts every time it is read.\n\n### Render pipeline\n\n`AutomateAttention.tokenURI` delegates to a **Renderer** (`0x6e8f02f70939ad8fa1497c6b3be5007c9100384e`), which:\n\n1. Runs an on-chain large language model, **OnChainLMv2** (`0x5f8e7d750e75b44747c058a204d8dea0d18fa5d3`), to generate a short aphorism for the token.\n2. Calls **ArtGenerator** (`0xcd84bc27d62e335cea20d1dff70d53f815489e16`), which dispatches across 23 art types to three sub-generators — **ArtGenA** (`0xd1f1d32aada5d09c602cf87e69d1d6d4fa6fa520`), **ArtGenB** (`0xa181e023e476a759f2423f02d61713db606fb45c`), and **ArtGenC** (`0x368934224d01230de6d6005fce4fe85ab37cee8c`) — to build an SVG.\n3. Packs the aphorism, SVG, and traits into a base64 `data:application/json` metadata URI.\n\n### Minting\n\nMinting is a flat 0.01 ETH via `mint()`. The first mint arms a rolling 24-hour window; every subsequent mint resets it. If 24 hours pass with no mint, minting closes permanently and can never reopen.\n\n### Traits\n\nTwo traits are fixed at mint time and packed into one byte per token:\n\n- **State / prefix** — derived from the time since the previous mint: `crowded` (< 5 min), `rising` (< 1 h), `falling` (< 6 h), or `scarce` (> 6 h). It selects the LLM prompt and the art pool.\n- **Wealth** — derived from the minter's ETH balance at mint time: `dust`, `modest` (≥ 0.1 ETH), `holder` (≥ 1 ETH), or `whale` (≥ 10 ETH). It shifts the generated art.\n\nThe project source describes itself as \"a vv inspired project by diid.\"",
+  "about": "## Automate Attention\n\nAutomate Attention (`AATTN`) is a fully on-chain ERC-721 collection. Nothing about a token is stored as a static file: each `tokenURI` is computed live from other contracts every time it is read.\n\n### Render pipeline\n\n`AutomateAttention.tokenURI` delegates to a **Renderer** (`0x6e8f02f70939ad8fa1497c6b3be5007c9100384e`), which:\n\n1. Runs an on-chain large language model, **OnChainLMv2** (`0x5f8e7d750e75b44747c058a204d8dea0d18fa5d3`), to generate a short aphorism for the token.\n2. Calls **ArtGenerator** (`0xcd84bc27d62e335cea20d1dff70d53f815489e16`), which dispatches across 23 art types to three sub-generators — **ArtGenA** (`0xd1f1d32aada5d09c602cf87e69d1d6d4fa6fa520`), **ArtGenB** (`0xa181e023e476a759f2423f02d61713db606fb45c`), and **ArtGenC** (`0x368934224d01230de6d6005fce4fe85ab37cee8c`) — to build an SVG.\n3. Packs the aphorism, SVG, and traits into a base64 `data:application/json` metadata URI.\n\n### Minting\n\nMinting is a flat 0.01 ETH via `mint()`. The first mint arms a rolling 24-hour window; every subsequent mint resets it. Once the 24-hour deadline passes with no mint, minting closes permanently and can never reopen.\n\n### Traits\n\nTwo traits are fixed at mint time and packed into one byte per token:\n\n- **State / prefix** — derived from the time since the previous mint: `crowded` (< 5 min), `rising` (< 1 h), `falling` (< 6 h), or `scarce` (≥ 6 h). It selects the LLM prompt and the art pool.\n- **Wealth** — derived from the minter's ETH balance at mint time: `dust`, `modest` (≥ 0.1 ETH), `holder` (≥ 1 ETH), or `whale` (≥ 10 ETH). It shifts the generated art.\n\nThe project source describes itself as \"a vv inspired project by diid.\"",
   "category": "nft",
   "tags": ["art", "generative", "onchain", "llm", "ai", "svg"],
   "risks": [
-    "Rolling 24h window — if no mint occurs for 24 hours, minting closes permanently and cannot reopen",
+    "Rolling 24h window — once the deadline passes with no mint, minting closes permanently and cannot reopen",
     "mint() requires exactly 0.01 ETH — any other amount reverts",
     "The current owner is the Dopamine contract; its public withdrawal flow pulls and splits collected ETH, and its creator can transfer Automate Attention ownership to any nonzero address without a timelock",
     "The wealth trait records the minter's approximate ETH balance at mint time onchain"
@@ -40,7 +40,7 @@
       "stateMutability": "payable",
       "group": "mint",
       "featured": true,
-      "warning": "Sends exactly 0.01 ETH. Any other amount reverts, and minting closes forever 24h after the last mint.",
+      "warning": "Sends exactly 0.01 ETH. Any other amount reverts, and minting closes forever once the 24-hour deadline passes.",
       "returns": {
         "_0": { "label": "token ID", "type": "token-id" }
       },
@@ -55,7 +55,7 @@
     },
     "mintDeadline": {
       "title": "Mint Deadline",
-      "description": "Unix time at which minting closes. Returns 0 before the first mint.",
+      "description": "Last Unix timestamp at which minting remains open. Returns 0 before the first mint.",
       "stateMutability": "view",
       "group": "mint",
       "returns": { "_0": { "label": "deadline", "type": "timestamp" } },
