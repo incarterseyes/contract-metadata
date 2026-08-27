@@ -222,8 +222,7 @@
         "_3": { "label": "additional payee % (primary)", "type": "percentage" },
         "_4": { "label": "additional payee (secondary)", "type": "address" },
         "_5": { "label": "additional payee % (secondary)", "type": "percentage" }
-      },
-      "related": ["adminAcceptArtistAddressesAndSplits"]
+      }
     },
     "addProject": {
       "order": 0,
@@ -247,8 +246,10 @@
     "adminAcceptArtistAddressesAndSplits": {
       "order": 2,
       "title": "Accept Payment Splits",
-      "description": "Accepts an artist's proposed payout addresses and splits. Callable through the AdminACL.",
+      "description": "Unavailable on this clone because artist payment changes are automatically accepted.",
       "group": "admin",
+      "hidden": true,
+      "warning": "This clone never retains a pending proposal for the AdminACL to accept, so this call reverts.",
       "params": {
         "_0": { "label": "project ID" },
         "_1": { "label": "artist address", "type": "address" },
@@ -256,8 +257,7 @@
         "_3": { "label": "additional payee % (primary)", "type": "percentage" },
         "_4": { "label": "additional payee (secondary)", "type": "address" },
         "_5": { "label": "additional payee % (secondary)", "type": "percentage" }
-      },
-      "related": ["proposeArtistPaymentAddressesAndSplits"]
+      }
     },
     "updateMinterContract": {
       "order": 3,
