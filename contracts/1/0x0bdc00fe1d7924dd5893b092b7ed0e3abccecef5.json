@@ -9,7 +9,7 @@
   },
   "name": "The Market Is Talking Renderer",
   "description": "The on-chain renderer that builds the metadata and HTML for the 1-of-1 NFT \"Silence, the market is talking\".",
-  "about": "## Role\n\nThis is the companion renderer for the 1-of-1 NFT \"Silence, the market is talking\" (art contract `TheMarketIsTalking`, `0xd6d8555e131c0c431601af62141a61a9b1aa6b13`). The art contract's `tokenURI` and `tokenHTML` delegate here to build the token's metadata and HTML on demand.\n\n## How it assembles the piece\n\nThe renderer reads the art contract's live state — the latest inputs, mood and RPC provider defaults — and stitches it with gzip-compressed `engine.js` and `renderer.js` scripts stored on-chain via scripty.sol (ScriptyStorageV2 and ScriptyBuilderV2). `tokenURI` returns base64 JSON metadata; `getHTML` returns the full, self-contained HTML document; `getVariablesAt` reproduces the injected variables for a historical block.\n\n## Ownership\n\nThe renderer is Ownable. The owner sets which art contract it reads (`setTMIT`), the stored script/asset names, and the website and whitepaper links surfaced in the metadata.",
+  "about": "## Role\n\nThis is the companion renderer for the 1-of-1 NFT \"Silence, the market is talking\" (art contract `TheMarketIsTalking`, `0xd6d8555e131c0c431601af62141a61a9b1aa6b13`). The art contract's `tokenURI` and `tokenHTML` delegate here to build the token's metadata and HTML on demand.\n\n## How it assembles the piece\n\nThe renderer reads the art contract's live state — the latest inputs, mood and RPC provider defaults — and stitches it with gzip-compressed `engine.js` and `renderer.js` scripts stored on-chain via scripty.sol (ScriptyStorageV2 and ScriptyBuilderV2). `tokenURI` returns base64 JSON metadata; `getHTML` returns the full, self-contained HTML document. `getVariablesAt` combines the historical inputs and mood for a block with the current RPC provider defaults and whitepaper configuration.\n\n## Ownership\n\nThe renderer is Ownable. The owner sets which art contract it reads (`setTMIT`), the stored script/asset names, and the website and whitepaper links surfaced in the metadata.",
   "category": "nft",
   "tags": ["renderer", "onchain", "metadata", "scripty", "art", "generative"],
   "links": [
@@ -52,7 +52,7 @@
     },
     "getVariablesAt": {
       "title": "Variables At Block",
-      "description": "Returns the injected variables block for the piece as it stood at a given block, for historical renders.",
+      "description": "Returns historical inputs and mood for a block combined with the current RPC provider defaults and whitepaper configuration.",
       "stateMutability": "view",
       "group": "render",
       "params": {
