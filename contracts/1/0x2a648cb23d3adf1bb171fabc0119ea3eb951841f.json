@@ -23,10 +23,11 @@
     "generative-art",
     "neural-network"
   ],
-  "about": "## The first fully on-chain neural network\n\nXOR by Nahiko is a single ERC-721 (token ID 0) that holds a neural network entirely on-chain — a small XOR gate visualized as a Yin-Yang. The image has two spheres, or \"hearts.\" The person who owns the NFT controls the left heart; the artist (Nahiko) controls the right heart.\n\n## How it works\n\nEach sphere is either on or off. `changeLeftSphere` (owner-only) and `changeRightSphere` (artist-only) flip their respective sphere. The network — three sigmoid neurons with fixed weights and biases — takes the two sphere states as inputs and computes an XOR: `isYingYang` returns true only when exactly one of the two spheres is on. The `tokenURI` image (white/black combinations of the two hearts) reflects the current state, all rendered from contract storage with no external hosting.\n\nThe neural-network architecture references a source article, pinned on IPFS and returned by `sourceArticle`.",
+  "about": "## The first fully on-chain neural network\n\nXOR by Nahiko is a single ERC-721 (token ID 0) that holds a neural network entirely on-chain — a small XOR gate visualized as a Yin-Yang. The image has two spheres, or \"hearts.\" The person who owns the NFT controls the left heart; the artist (Nahiko) controls the right heart.\n\n## How it works\n\nEach sphere is either on or off. `changeLeftSphere` (owner-only) and `changeRightSphere` (artist-only) flip their respective sphere. The network — three sigmoid neurons with fixed weights and biases — takes the two sphere states as inputs and computes an XOR: `isYingYang` returns true only when exactly one of the two spheres is on. Based on that state, `tokenURI` selects one of four PNGs hosted on IPFS; the state and URI selection are on-chain, but the image bytes are not stored in the contract.\n\nThe neural-network architecture references a source article, pinned on IPFS and returned by `sourceArticle`.",
   "risks": [
     "The artist (Nahiko) permanently controls the right sphere and can reassign that control to any address via setNahikoAddress",
     "Only a single token (ID 0) exists and there is no minting function; the collection cannot grow",
+    "The token images are externally hosted PNGs addressed by IPFS URIs, so display depends on the files remaining available through IPFS",
     "The contract is not upgradeable, so its behavior is fixed permanently"
   ],
   "links": [
