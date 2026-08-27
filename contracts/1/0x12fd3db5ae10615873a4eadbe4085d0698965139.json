@@ -16,7 +16,7 @@
   "risks": [
     "Rolling 24h window — if no mint occurs for 24 hours, minting closes permanently and cannot reopen",
     "mint() requires exactly 0.01 ETH — any other amount reverts",
-    "Ownership is a single EOA that can withdraw ETH and transfer ownership; no multisig or timelock",
+    "The current owner is the Dopamine contract; its public withdrawal flow pulls and splits collected ETH, and its creator can transfer Automate Attention ownership to any nonzero address without a timelock",
     "The wealth trait records the minter's approximate ETH balance at mint time onchain"
   ],
   "links": [
