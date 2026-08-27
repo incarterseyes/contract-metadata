@@ -4,7 +4,7 @@
   "address": "0x12fd3db5ae10615873a4eadbe4085d0698965139",
   "meta": {
     "version": 1,
-    "lastUpdated": "2026-08-21T00:00:00Z",
+    "lastUpdated": "2026-08-27T00:00:00Z",
     "locale": "en"
   },
   "name": "Automate Attention",
@@ -49,7 +49,7 @@
     "currentPrice": {
       "title": "Current Price",
       "description": "The flat mint price. Always 0.01 ETH.",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "mint",
       "returns": { "_0": { "label": "price", "type": "eth" } }
     },
