@@ -23,7 +23,8 @@
   "risks": [
     "EIP-1167 clone — all logic is delegated to the shared implementation at 0x0000...0457",
     "The AdminACL super-admin can swap the minter, randomizer, split provider, bytecode reader, and provider payout addresses at any time",
-    "While a project is unlocked, the artist (or admin) can rewrite its script, base URI, name, and max invocations",
+    "Before a project is locked, its artist or authorized AdminACL callers can rewrite its scripts and name",
+    "Locking does not freeze every setting: the artist can still change its base URI and lower max invocations",
     "Minting is gated entirely through the external MinterFilter; the core does not sell tokens directly",
     "Token hash seeds that drive generative output are assigned post-mint by the external randomizer contract"
   ],
@@ -210,9 +211,10 @@
     },
     "proposeArtistPaymentAddressesAndSplits": {
       "order": 6,
-      "title": "Propose Payment Splits",
-      "description": "Proposes new artist and additional-payee payout addresses and splits. Callable by the project's artist.",
+      "title": "Update Payment Splits",
+      "description": "Updates artist and additional-payee payout addresses and splits; this clone automatically accepts every proposal.",
       "group": "artist",
+      "warning": "Changes take effect immediately without a separate AdminACL acceptance.",
       "params": {
         "_0": { "label": "project ID" },
         "_1": { "label": "artist address", "type": "address" },
@@ -234,10 +236,10 @@
       }
     },
     "toggleProjectIsActive": {
-      "order": 1,
+      "order": 7,
       "title": "Toggle Active",
-      "description": "Activates or deactivates a project so it can be minted. Callable only through the AdminACL.",
-      "group": "admin",
+      "description": "Activates or deactivates a project. The project artist or an authorized AdminACL caller can use this clone.",
+      "group": "artist",
       "params": {
         "_0": { "label": "project ID" }
       }
