@@ -77,7 +77,7 @@
     },
     "mintLaunchInventory": {
       "title": "Mint Launch Inventory",
-      "description": "Mint the one-time launch inventory to an address. Callable once by an authorized minter.",
+      "description": "Mint the one-time launch inventory to an address. Callable once by the owner.",
       "group": "admin",
       "params": { "_0": { "label": "recipient", "type": "address" } },
       "related": ["launchInventoryMinted"]

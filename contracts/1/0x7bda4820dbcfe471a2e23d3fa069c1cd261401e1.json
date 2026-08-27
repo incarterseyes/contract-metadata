@@ -79,7 +79,7 @@
     },
     "setLegacyMergeState": {
       "title": "Set Legacy Merge State",
-      "description": "Set the legacy merge-state source read for migration. Only the owner can call this.",
+      "description": "Set the legacy merge-state source read for migration. Only the Slonks NFT owner can call this.",
       "group": "admin",
       "params": { "_0": { "label": "legacy merge state", "type": "address" } }
     }
