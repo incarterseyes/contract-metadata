@@ -151,7 +151,7 @@
       "group": "info",
       "order": 2,
       "intent": "Set artist address to {newNahiko}",
-      "warning": "Only the current artist address can call this.",
+      "warning": "Only the current artist can call this; setting the zero address permanently freezes both artist-only actions.",
       "params": {
         "newNahiko": {
           "label": "new artist",
