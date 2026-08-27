@@ -23,6 +23,7 @@
   "risks": [
     "The renderer is owner-swappable via setRenderer, so the displayed artwork and metadata can be changed at any time.",
     "Centralized roles: the owner controls the hosioi set and the renderer, and the token holder (prophet) controls the mood.",
+    "The renderer interpolates hosioi-controlled inputs and providers, prophet-controlled mood, and renderer-owner-controlled configuration into inline JavaScript without escaping. A malicious or compromised role can inject arbitrary code into tokenHTML and animation_url; consumers should sandbox the HTML.",
     "The live piece depends on external RPC endpoints and the scripty.sol contracts to assemble and render, and can break if those change."
   ],
   "groups": {

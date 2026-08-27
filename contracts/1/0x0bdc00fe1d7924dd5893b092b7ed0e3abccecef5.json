@@ -20,6 +20,7 @@
   ],
   "risks": [
     "Ownable: the owner can change the art contract this renderer reads and every stored script/asset name, altering the output.",
+    "Rendered HTML interpolates art-contract inputs, mood and RPC provider strings, plus the renderer owner's whitepaper, into inline JavaScript without escaping. A malicious or compromised role can inject arbitrary code; consumers should sandbox the HTML.",
     "Output depends on the scripty.sol contracts and external RPC endpoints, and can break if those become unavailable.",
     "The art contract's owner can swap to a different renderer entirely via setRenderer, retiring this one."
   ],
