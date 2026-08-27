@@ -8,8 +8,8 @@
     "locale": "en"
   },
   "name": "Slonks Slop Game",
-  "description": "The void and $SLOP game for Slonks: it locks Slonks in the void, tracks slop, and mints the $SLOP token.",
-  "about": "## Role in the Slonks system\n\nThis contract (SlopGameV2) is the hub of the Slonks game economy. It holds each token's slop (the pixel divergence from the original punk, 0 to 576), runs the void where holders lock Slonks to mint the **$SLOP** token (`0x999b49c0d1612e619a4a4f6280733184da025108`), and exposes the active merge and embedding state that the **SlonksRenderer** (`0x726383bd28fa1f95a7e3d300babf08f6444d0437`) reads.\n\nIt is an authorized metadata updater on the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`), so it can trigger ERC-4906 refreshes when state changes. It is wired to the live **SlonksMergeManager** (`0x7bda4820dbcfe471a2e23d3fa069c1cd261401e1`).\n\n## Slop claim verification\n\nThe on-chain model-output verifier for `claimSlop` is currently a stub, `RejectingSlopVerifier` (`0x5e054061de6d79b7f52f6c23a55787a39f0169ce`), which rejects proofs; verification is not yet live. The owner can replace it via `setModelOutputVerifier`.",
+  "description": "The void and $SLOP game for Slonks: it locks tokens for claims, computes slop, and holds voided Slonks.",
+  "about": "## Role in the Slonks system\n\nThis contract (SlopGameV2) is the hub of the Slonks game economy. It computes each token's slop (the pixel divergence from the original punk, 0 to 576), lets holders lock Slonks before a successful proof moves them into the void and mints the **$SLOP** token (`0x999b49c0d1612e619a4a4f6280733184da025108`), and exposes the active merge and embedding state that the **SlonksRenderer** (`0x726383bd28fa1f95a7e3d300babf08f6444d0437`) reads.\n\nIt is an authorized metadata updater on the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`), so it can trigger ERC-4906 refreshes when state changes. It is wired to the live **SlonksMergeManager** (`0x7bda4820dbcfe471a2e23d3fa069c1cd261401e1`).\n\n## Slop claim verification\n\nThe on-chain model-output verifier for `claimSlop` is currently a stub, `RejectingSlopVerifier` (`0x5e054061de6d79b7f52f6c23a55787a39f0169ce`), which rejects proofs; verification is not yet live. The owner can replace it via `setModelOutputVerifier`.",
   "category": "game",
   "tags": ["game", "void", "slop", "onchain", "slonks"],
   "links": [
@@ -51,31 +51,33 @@
     },
     "buyAndVoidSlonk": {
       "title": "Buy and Void",
-      "description": "Buy a listed Slonk and immediately void it, minting $SLOP based on its slop.",
+      "description": "Spend accrued protocol ETH through a marketplace or router to buy a Slonk and place it in the void.",
       "group": "void",
-      "warning": "Sends ETH to purchase and permanently voids the token; the purchase is not reversible.",
+      "warning": "Uses protocol funds and caller-supplied purchase calldata. The caller sends no ETH, and no $SLOP is minted.",
       "params": {
         "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } },
-        "_1": { "label": "recipient", "type": "address" },
-        "_2": { "label": "max price", "type": "eth" },
-        "_3": { "label": "order data" }
+        "_1": { "label": "marketplace or router", "type": "address" },
+        "_2": { "label": "ETH to send", "type": "eth" },
+        "_3": { "label": "purchase calldata" }
       },
       "related": ["isInVoid", "slopToken"]
     },
     "claimSlop": {
       "title": "Claim Slop",
-      "description": "Claim $SLOP for a voided token by submitting a model-output proof.",
+      "description": "Submit a model-output proof for a locked Slonk, moving it into the void and minting $SLOP if valid.",
       "group": "void",
+      "hidden": true,
+      "deprecated": "Unavailable: the currently configured verifier rejects every proof.",
       "params": {
         "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } },
         "_1": { "label": "proof" },
-        "_2": { "label": "merkle proof" }
+        "_2": { "label": "public inputs" }
       },
       "related": ["slopToken", "isSlopClaimPending"]
     },
     "isSlopClaimPending": {
       "title": "Is Slop Claim Pending",
-      "description": "Whether a voided token still has an unclaimed $SLOP allocation.",
+      "description": "Whether a Slonk is locked in game custody and still awaits a successful claim proof.",
       "stateMutability": "view",
       "group": "void",
       "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } },
@@ -84,8 +86,9 @@
     },
     "lockSlonk": {
       "title": "Lock Slonk",
-      "description": "Lock one of your Slonks so it cannot be transferred while in play.",
+      "description": "Transfer one of your Slonks into game custody while awaiting a model-output claim proof.",
       "group": "void",
+      "warning": "The token can be unlocked only before a claim succeeds and moves it into the void.",
       "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } },
       "related": ["unlockSlonk"]
     },
