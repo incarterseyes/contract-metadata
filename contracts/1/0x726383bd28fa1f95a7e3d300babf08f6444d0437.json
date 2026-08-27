@@ -163,7 +163,7 @@
     },
     "PreRevealUnavailable": {
       "title": "Pre-Reveal Unavailable",
-      "description": "No pre-reveal image URL is configured."
+      "description": "Pixel prediction is unavailable before the collection reveal."
     },
     "NotRendererOwner": {
       "title": "Not Renderer Owner",
