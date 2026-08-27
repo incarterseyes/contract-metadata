@@ -63,16 +63,16 @@
     },
     "royaltyInfo": {
       "title": "Royalty Info",
-      "description": "The ERC-2981 royalty receiver and amount owed for a given sale price.",
+      "description": "The ERC-2981 receiver and royalty amount, using the same currency units as the supplied sale price.",
       "stateMutability": "view",
       "group": "info",
       "params": {
         "_0": { "label": "token ID", "type": "token-id" },
-        "_1": { "label": "sale price", "type": "eth" }
+        "_1": { "label": "sale price (currency units)" }
       },
       "returns": {
         "_0": { "label": "receiver", "type": "address" },
-        "_1": { "label": "royalty amount", "type": "eth" }
+        "_1": { "label": "royalty amount (same units)" }
       }
     },
     "sourceIdFor": {
