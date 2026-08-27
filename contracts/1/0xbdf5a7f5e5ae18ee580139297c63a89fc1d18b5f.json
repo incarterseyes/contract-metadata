@@ -41,14 +41,14 @@
       "order": 0,
       "title": "Name",
       "description": "The name of the artwork (Artificial).",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "artwork"
     },
     "symbol": {
       "order": 1,
       "title": "Symbol",
       "description": "The token symbol (A).",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "artwork"
     },
     "artificialHTML": {

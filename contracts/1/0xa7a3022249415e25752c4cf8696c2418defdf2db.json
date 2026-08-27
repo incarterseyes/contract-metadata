@@ -41,14 +41,14 @@
       "order": 0,
       "title": "Name",
       "description": "The name of the collection (Artificial After All).",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "collection"
     },
     "symbol": {
       "order": 1,
       "title": "Symbol",
       "description": "The collection symbol (AAA).",
-      "stateMutability": "view",
+      "stateMutability": "pure",
       "group": "collection"
     },
     "thisMany": {
