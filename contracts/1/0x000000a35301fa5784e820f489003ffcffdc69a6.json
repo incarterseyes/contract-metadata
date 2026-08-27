@@ -106,11 +106,11 @@
       "group": "collection",
       "params": {
         "_0": { "label": "token ID", "type": "token-id" },
-        "_1": { "label": "sale price", "type": "eth" }
+        "_1": { "label": "sale price" }
       },
       "returns": {
         "receiver": { "label": "recipient", "type": "address" },
-        "royaltyAmount": { "label": "royalty", "type": "eth" }
+        "royaltyAmount": { "label": "royalty" }
       }
     },
     "mint_Ecf": {
