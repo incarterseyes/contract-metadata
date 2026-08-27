@@ -116,7 +116,7 @@
     },
     "NotSlonksOwner": {
       "title": "Not Slonks Owner",
-      "description": "The caller does not own the token being merged."
+      "description": "The caller is not the owner of the Slonks NFT contract."
     },
     "ZeroAddress": {
       "title": "Zero Address",
