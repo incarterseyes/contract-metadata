@@ -158,8 +158,8 @@
   "errors": {
     "InvalidSlonkId": {
       "title": "Invalid Slonk ID",
-      "description": "The token id is out of range.",
-      "params": { "_0": { "label": "token ID", "type": { "type": "token-id", "tokenAddress": "0x832233ddb7bcffd0ed53127dd6be3f1aa5845108" } } }
+      "description": "The token or source id is out of range.",
+      "params": { "_0": { "label": "token or source ID" } }
     },
     "PreRevealUnavailable": {
       "title": "Pre-Reveal Unavailable",
