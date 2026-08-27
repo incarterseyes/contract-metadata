@@ -60,11 +60,23 @@
     "projectStateData": {
       "order": 2,
       "title": "Project State",
-      "description": "Returns a project's invocations, max invocations, and its active, paused, and locked flags.",
+      "description": "Returns invocation counts, active and paused flags, completion time, and locked state.",
       "stateMutability": "view",
       "group": "collection",
       "params": {
         "_0": { "label": "project ID" }
+      },
+      "returns": {
+        "invocations": { "label": "invocations" },
+        "maxInvocations": { "label": "max invocations" },
+        "active": { "label": "active", "type": "boolean" },
+        "paused": { "label": "paused", "type": "boolean" },
+        "completedTimestamp": {
+          "label": "completed at",
+          "description": "Zero until completion; otherwise the Unix timestamp when the project completed.",
+          "type": "timestamp"
+        },
+        "locked": { "label": "locked", "type": "boolean" }
       }
     },
     "projectScriptByIndex": {
