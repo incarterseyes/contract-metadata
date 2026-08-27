@@ -10,8 +10,8 @@
   "includes": ["interface:erc20"],
   "name": "SLOP",
   "symbol": "SLOP",
-  "description": "The $SLOP ERC-20 token of the Slonks ecosystem, minted when holders lock their Slonks in the void.",
-  "about": "## About $SLOP\n\n$SLOP is the ERC-20 token of the Slonks ecosystem. It has 18 decimals and supports EIP-2612 permit. It is minted by authorized minters — primarily **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`), the void game — when holders void their Slonks, with the amount driven by each token's slop. It relates to the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`).\n\nMinting is capped by a maximum supply, and a one-time launch inventory can be minted once. The circulating and total supply change over time as Slonks are voided.",
+  "description": "The $SLOP ERC-20 token, minted after a valid proof moves a locked Slonk into the void.",
+  "about": "## About $SLOP\n\n$SLOP is the ERC-20 token of the Slonks ecosystem. It has 18 decimals and supports EIP-2612 permit. It is minted by authorized minters — primarily **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`), the void game — after a valid proof moves a holder's locked Slonk into the void, with the amount driven by that token's slop. It relates to the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`).\n\nMinting is capped by a maximum supply, and a one-time launch inventory can be minted once. Authorized minters can also burn balances as part of Slonks game mechanics, so circulating and total supply change over time.",
   "category": "token",
   "tags": ["token", "erc20", "slop", "slonks"],
   "links": [
@@ -19,7 +19,7 @@
     { "label": "Website", "url": "https://www.slonks.art/" }
   ],
   "risks": [
-    "Any address the owner authorizes as a minter can mint or burn $SLOP up to the max supply"
+    "The owner can authorize minters that may mint up to the supply cap and burn tokens from any specified holder without allowance"
   ],
   "groups": {
     "supply": { "label": "Supply", "order": 1 },
