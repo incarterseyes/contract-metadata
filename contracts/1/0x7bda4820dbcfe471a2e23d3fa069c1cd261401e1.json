@@ -9,7 +9,7 @@
   },
   "name": "Slonks Merge Manager",
   "description": "The live merge manager for Slonks: it burns one same-level Slonk into another and averages their embeddings.",
-  "about": "## Role in the Slonks system\n\nThis is the active merge manager for the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`). Merging picks a survivor token and burns a donor of the same merge level; their embeddings are averaged and the result is re-rendered. It is an authorized metadata updater on the NFT. It reads **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`) as an active-state fallback, while SlopGameV2 reads this manager for base merge state.\n\nThis deployment supersedes an earlier merge manager (`0x3c60eff7b4aff33a3ad5f0b7c9c7d13ba80a422f`), which the current renderer still references as a fallback read but which is no longer the authoritative merge recorder.",
+  "about": "## Role in the Slonks system\n\nThis is the active merge manager for the **Slonks** NFT (`0x832233ddb7bcffd0ed53127dd6be3f1aa5845108`). Merging picks a survivor token and burns a donor of the same merge level; their embeddings are averaged and the result is re-rendered. It is an authorized metadata updater on the NFT. It reads **SlopGameV2** (`0x76c61b6140600429f50de5ac987e41672047cc28`) as an active-state fallback, while SlopGameV2 reads this manager for base merge state.\n\nThis deployment supersedes an earlier merge manager (`0x3c60eff7b4aff33a3ad5f0b7c9c7d13ba80a422f`), which the current renderer still queries directly for merge state but which is no longer the authoritative merge recorder.",
   "category": "utility",
   "tags": ["merge", "onchain", "slop", "slonks"],
   "links": [
